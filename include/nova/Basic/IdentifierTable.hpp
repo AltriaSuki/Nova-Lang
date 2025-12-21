@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
-
 namespace nova {
 
 struct IdentifierInfo {
@@ -26,9 +25,12 @@ public:
     IdentifierTable();
 
     IdentifierInfo* get(std::string_view name);
+    //string_view because somewhere exists a string in memory
+    void add_identifier(const char* name);
 
 private:
     void add_keyword(const char* name, TokenKind kind);
+    
 };
 
 } // namespace nova

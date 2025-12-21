@@ -39,10 +39,13 @@ enum class TokenKind {
 
     // Special
     eof,
-    unknown
+    unknown,
+    //this must be last to get the count of tokens
+    count
 };
-
+//this is english word of the token
 const char* get_token_name(TokenKind kind);
+//this is punctuation of the token
 const char* get_punctuation_spelling(TokenKind kind);
 
 } // namespace nova
