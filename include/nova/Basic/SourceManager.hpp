@@ -18,7 +18,7 @@ struct FileEntry {
 private:
     void compute_line_offsets();
 };
-
+// manages all source files and provides utilities to query source locations
 class SourceManager {
 private:
     std::vector<std::unique_ptr<FileEntry>> files_;

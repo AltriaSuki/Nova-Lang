@@ -4,6 +4,8 @@
 namespace nova {
 
 /// Compact source location (32-bit encoded)
+//offset range from 0 to 1MB - 1 (20 bits)
+//0 offset and 0 file_id is reserved for invalid location
 class SourceLocation {
 private:
     //such design to save memory usage
@@ -27,7 +29,8 @@ public:
 
     bool is_valid() const { return raw_encoding_ != 0; }
     bool is_invalid() const { return raw_encoding_ == 0; }
-
+    // get a new SourceLocation with the same file_id but different offset
+    //use for sourcerange begin/end location calculation
     SourceLocation get_offset_location(int32_t offset) const;
 
     bool operator==(SourceLocation other) const {

@@ -1,5 +1,6 @@
 add_executable(novaTests
     LexerTest.cpp
+    SourceLocationTest.cpp
 )
 
 target_link_libraries(novaTests PRIVATE
