@@ -4,7 +4,7 @@
 #include "nova/Basic/IdentifierTable.hpp"
 
 namespace nova {
-
+// 词法分析器
 class Lexer {
 private:
     const SourceManager& source_manager_;
