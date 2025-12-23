@@ -1,0 +1,25 @@
+// Nova Standard Library - Math Module
+// TODO: Implement mathematical functions
+
+// Constants
+// pub let PI: f64 = 3.14159265358979323846;
+// pub let E: f64 = 2.71828182845904523536;
+// pub let TAU: f64 = 6.28318530717958647692;
+
+// Basic functions
+// pub func abs<T: Num>(x: T) -> T { ... }
+// pub func min<T: Ord>(a: T, b: T) -> T { ... }
+// pub func max<T: Ord>(a: T, b: T) -> T { ... }
+// pub func clamp<T: Ord>(x: T, min: T, max: T) -> T { ... }
+
+// Trigonometric
+// pub func sin(x: f64) -> f64 { ... }
+// pub func cos(x: f64) -> f64 { ... }
+// pub func tan(x: f64) -> f64 { ... }
+
+// Exponential/Logarithmic
+// pub func sqrt(x: f64) -> f64 { ... }
+// pub func pow(base: f64, exp: f64) -> f64 { ... }
+// pub func log(x: f64) -> f64 { ... }
+// pub func log10(x: f64) -> f64 { ... }
+// pub func exp(x: f64) -> f64 { ... }

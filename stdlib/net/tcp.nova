@@ -1,0 +1,6 @@
+// Nova Standard Library - TCP Networking
+// TODO: Implement TCP primitives
+
+// class TcpListener { ... }
+// class TcpStream { ... }
+// class SocketAddr { ... }

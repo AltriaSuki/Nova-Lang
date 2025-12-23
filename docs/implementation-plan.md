@@ -6,6 +6,29 @@ A complete roadmap to build a Rust-like language with ownership, borrowing, gene
 
 ---
 
+## Table of Contents
+
+- [Phase 1: Core Infrastructure & Lexer](#phase-1-core-infrastructure--lexer-weeks-1-6)
+- [Phase 2: Parser & AST](#phase-2-parser--ast-weeks-7-14)
+- [Phase 3: Semantic Analysis & Type Checking](#phase-3-semantic-analysis--type-checking-weeks-15-22)
+- [Phase 4: Basic Interpreter](#phase-4-basic-interpreter-weeks-23-30)
+- [Phase 5: Structs & Enums](#phase-5-structs--enums-weeks-31-38)
+- [Phase 6: Generics](#phase-6-generics-weeks-39-50)
+- [Phase 7: Ownership & Borrowing](#phase-7-ownership--borrowing-weeks-51-66)
+- [Phase 8: Traits](#phase-8-traits-weeks-67-78)
+- [Phase 9: Pattern Matching](#phase-9-pattern-matching-weeks-79-86)
+- [Phase 10: Closures & Functional Features](#phase-10-closures--functional-features-weeks-87-94)
+- [Phase 11: LLVM Code Generation](#phase-11-llvm-code-generation-weeks-95-110)
+- [Phase 12: Module System](#phase-12-module-system-weeks-111-118)
+- [Phase 13: Standard Library](#phase-13-standard-library-weeks-119-130)
+- [Phase 14: Macros](#phase-14-macros-weeks-131-142)
+- [Phase 15: Attributes & Derives](#phase-15-attributes--derives-weeks-143-148)
+- [Phase 16: Error Messages & Polish](#phase-16-error-messages--polish-weeks-149-156)
+- [Final Project Structure](#final-project-structure)
+- [Summary Timeline](#summary-timeline)
+
+---
+
 ## Phase 1: Core Infrastructure & Lexer (Weeks 1-6)
 
 ### Goal
@@ -734,22 +757,60 @@ Essential types and functions.
 
 ### Files to Create (`stdlib/`)
 
-| Module | Contents |
-|--------|----------|
-| `core/prelude.nova` | [ ] Auto-imported types |
-| `core/option.nova` | [ ] Option<T> with methods |
-| `core/result.nova` | [ ] Result<T, E> with methods |
-| `core/string.nova` | [ ] String type |
-| `core/slice.nova` | [ ] Slice operations |
-| `collections/vec.nova` | [ ] Vec<T> dynamic array |
-| `collections/hashmap.nova` | [ ] HashMap<K, V> |
-| `collections/hashset.nova` | [ ] HashSet<T> |
-| `io/mod.nova` | [ ] File I/O |
-| `io/stdin.nova` | [ ] Standard input |
-| `io/stdout.nova` | [ ] Standard output |
-| `fmt/mod.nova` | [ ] Formatting |
-| `iter/mod.nova` | [ ] Iterator trait and adaptors |
-| `iter/adaptors.nova` | [ ] map, filter, fold, etc. |
+#### Core Module (`stdlib/core/`)
+| File | Tasks |
+|------|-------|
+| `prelude.nova` | [ ] Auto-imported types and traits |
+| `option.nova` | [ ] Option<T> with methods |
+| `result.nova` | [ ] Result<T, E> with methods |
+| `iter.nova` | [ ] Iterator trait and adaptors |
+| `string.nova` | [ ] String type |
+| `ops.nova` | [ ] Operator traits (Add, Sub, Mul, Div, Index, Deref) |
+| `cmp.nova` | [ ] Comparison traits (PartialEq, Eq, PartialOrd, Ord) |
+| `clone.nova` | [ ] Clone and Copy traits |
+| `default.nova` | [ ] Default trait |
+| `fmt.nova` | [ ] Formatting traits (Debug, Display) |
+| `mem.nova` | [ ] Memory operations (size_of, swap, replace) |
+| `ptr.nova` | [ ] Pointer types and operations |
+| `slice.nova` | [ ] Slice type and operations |
+
+#### Collections Module (`stdlib/collections/`)
+| File | Tasks |
+|------|-------|
+| `vec.nova` | [ ] Vec<T> dynamic array |
+| `hashmap.nova` | [ ] HashMap<K, V> |
+| `hashset.nova` | [ ] HashSet<T> |
+| `linkedlist.nova` | [ ] LinkedList<T> doubly-linked list |
+| `deque.nova` | [ ] Deque<T> double-ended queue |
+
+#### I/O Module (`stdlib/io/`)
+| File | Tasks |
+|------|-------|
+| `mod.nova` | [ ] Read and Write traits, stdin, stdout, stderr |
+| `file.nova` | [ ] File type and operations |
+
+#### Synchronization Module (`stdlib/sync/`)
+| File | Tasks |
+|------|-------|
+| `mod.nova` | [ ] Synchronization primitives module |
+| `mutex.nova` | [ ] Mutex<T> mutual exclusion |
+| `rwlock.nova` | [ ] RwLock<T> reader-writer lock |
+| `arc.nova` | [ ] Arc<T> atomic reference counting |
+
+#### Threading Module (`stdlib/thread/`)
+| File | Tasks |
+|------|-------|
+| `mod.nova` | [ ] Thread spawn, join, sleep, current |
+
+#### Async Module (`stdlib/async/`)
+| File | Tasks |
+|------|-------|
+| `mod.nova` | [ ] Future trait and async runtime |
+
+#### Error Module (`stdlib/`)
+| File | Tasks |
+|------|-------|
+| `error.nova` | [ ] Error trait and common error types |
 
 ### Key Standard Library Types
 ```nova
@@ -970,8 +1031,38 @@ Nova-Lang/
 │   └── (matching .cpp files)
 ├── stdlib/
 │   ├── core/
+│   │   ├── prelude.nova
+│   │   ├── option.nova
+│   │   ├── result.nova
+│   │   ├── iter.nova
+│   │   ├── string.nova
+│   │   ├── ops.nova
+│   │   ├── cmp.nova
+│   │   ├── clone.nova
+│   │   ├── default.nova
+│   │   ├── fmt.nova
+│   │   ├── mem.nova
+│   │   ├── ptr.nova
+│   │   └── slice.nova
 │   ├── collections/
+│   │   ├── vec.nova
+│   │   ├── hashmap.nova
+│   │   ├── hashset.nova
+│   │   ├── linkedlist.nova
+│   │   └── deque.nova
 │   ├── io/
+│   │   ├── mod.nova
+│   │   └── file.nova
+│   ├── sync/
+│   │   ├── mod.nova
+│   │   ├── mutex.nova
+│   │   ├── rwlock.nova
+│   │   └── arc.nova
+│   ├── thread/
+│   │   └── mod.nova
+│   ├── async/
+│   │   └── mod.nova
+│   └── error.nova
 │   └── iter/
 ├── tools/
 │   ├── nova/

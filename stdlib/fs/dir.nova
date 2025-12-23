@@ -1,0 +1,7 @@
+// Nova Standard Library - Directory Operations
+// TODO: Implement directory operations
+
+// func create_dir(path: &Path) -> Result<(), IoError> { ... }
+// func create_dir_all(path: &Path) -> Result<(), IoError> { ... }
+// func remove_dir(path: &Path) -> Result<(), IoError> { ... }
+// func read_dir(path: &Path) -> Result<DirIter, IoError> { ... }

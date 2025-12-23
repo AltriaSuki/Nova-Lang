@@ -1,0 +1,44 @@
+# Nova Release Pipeline
+# TODO: Configure and enable
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: nova-linux-x64
+          - os: macos-latest
+            artifact: nova-macos-x64
+          # - os: windows-latest
+          #   artifact: nova-windows-x64
+            
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Release
+      run: |
+        mkdir build && cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --config Release
+        
+    - name: Package
+      run: |
+        mkdir -p dist
+        cp build/bin/nova dist/
+        cp build/bin/nova-repl dist/
+        tar -czvf ${{ matrix.artifact }}.tar.gz -C dist .
+        
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact }}
+        path: ${{ matrix.artifact }}.tar.gz

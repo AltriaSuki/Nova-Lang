@@ -1,0 +1,8 @@
+// Nova Standard Library - Instant
+// TODO: Implement monotonic clock
+
+// class Instant {
+//     func now() -> Instant { ... }
+//     func elapsed(&self) -> Duration { ... }
+//     func duration_since(&self, earlier: &Instant) -> Duration { ... }
+// }

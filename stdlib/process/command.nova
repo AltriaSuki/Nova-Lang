@@ -1,0 +1,17 @@
+// Nova Standard Library - Command Execution
+// TODO: Implement subprocess spawning
+
+// class Command {
+//     func new(program: &str) -> Command { ... }
+//     func arg(&mut self, arg: &str) -> &mut Self { ... }
+//     func args(&mut self, args: &[&str]) -> &mut Self { ... }
+//     func env(&mut self, key: &str, val: &str) -> &mut Self { ... }
+//     func current_dir(&mut self, dir: &Path) -> &mut Self { ... }
+//     func spawn(&self) -> Result<Child, IoError> { ... }
+//     func output(&self) -> Result<Output, IoError> { ... }
+//     func status(&self) -> Result<ExitStatus, IoError> { ... }
+// }
+
+// class Child { ... }
+// class Output { ... }
+// class ExitStatus { ... }

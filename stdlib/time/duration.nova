@@ -1,0 +1,15 @@
+// Nova Standard Library - Duration
+// TODO: Implement duration type
+
+// class Duration {
+//     secs: u64,
+//     nanos: u32,
+//     
+//     func from_secs(secs: u64) -> Duration { ... }
+//     func from_millis(millis: u64) -> Duration { ... }
+//     func from_micros(micros: u64) -> Duration { ... }
+//     func from_nanos(nanos: u64) -> Duration { ... }
+//     
+//     func as_secs(&self) -> u64 { ... }
+//     func as_millis(&self) -> u128 { ... }
+// }

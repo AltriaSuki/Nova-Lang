@@ -1,0 +1,67 @@
+# Nova CI/CD Pipeline
+# TODO: Configure and enable
+
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        compiler: [gcc, clang]
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install Dependencies (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build
+        
+    - name: Install Dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install cmake ninja
+        
+    - name: Configure
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
+        
+    - name: Build
+      run: cmake --build build
+      
+    - name: Test
+      run: |
+        cd build
+        ctest --output-on-failure
+
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   - name: Run clang-format
+  #     run: |
+  #       find lib include -name '*.cpp' -o -name '*.hpp' | xargs clang-format --dry-run -Werror
+
+  # coverage:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   - name: Build with coverage
+  #     run: |
+  #       mkdir build && cd build
+  #       cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=ON
+  #       make
+  #       ctest
+  #   - name: Upload coverage
+  #     uses: codecov/codecov-action@v3

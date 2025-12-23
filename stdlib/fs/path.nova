@@ -1,0 +1,7 @@
+// Nova Standard Library - Path Handling
+// TODO: Implement path operations
+
+// class Path { ... }
+// class PathBuf { ... }
+// func join(base: &Path, other: &Path) -> PathBuf { ... }
+// func extension(path: &Path) -> Option<&str> { ... }

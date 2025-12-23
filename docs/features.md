@@ -1,32 +1,74 @@
+# Nova Language Features
+
+A comprehensive guide to Nova's language features.
+
+> **Nova: The C++ you wish existed — modern, safe, no C legacy.**
+
+## Design Philosophy
+
+| Principle | Implementation |
+|-----------|----------------|
+| **Functional-First** | Immutable by default, expressions return values, pattern matching |
+| **Strong + Static + Inference** | All types known at compile time, inferred when obvious |
+| **RAII** | Scope-based drop — deterministic, predictable resource cleanup |
+| **No GC** | Ownership + borrowing, zero runtime overhead |
+| **No UB** | Everything defined, no undefined behavior |
+
+```nova
+// Functional-first: everything is an expression
+let result = if condition { value1 } else { value2 }
+
+let status = match state {
+    State::Running => "running",
+    State::Stopped => "stopped",
+    _ => "unknown"
+}
+
+// RAII: scope-based drop
+{
+    let file = File::open("data.txt")?  // resource acquired
+    file.write("hello")
+}   // file automatically dropped here, resource released
+
+// Immutable by default
+let x = 5           // immutable
+let mut y = 10      // explicit mutability
+```
+
 ## Table of Contents
 
-- [ ] [Core Syntax & Basic Types](#core-syntax)
-- [ ] [Variables & Mutability](#variables-mutability)
-- [ ] [Functions](#functions)
-- [ ] [Control Flow](#control-flow)
-- [ ] [Ownership & Borrowing](#ownership-borrowing)
-- [ ] [Type System & Inference](#type-system-inference)
-- [ ] [Generics](#generics)
-- [ ] [Pattern Matching](#pattern-matching)
-- [ ] [Error Handling](#error-handling)
-- [ ] [Object-Oriented Programming](#object-oriented-programming)
-- [ ] [Traits & Interfaces](#traits-interfaces)
-- [ ] [Functional Programming](#functional-programming)
-- [ ] [Module System](#module-system)
-- [ ] [Collections](#collections)
-- [ ] [Iterators](#iterators)
-- [ ] [Concurrency](#concurrency)
-- [ ] [Unsafe Code](#unsafe-code)
-- [ ] [Macros](#macros)
-- [ ] [Attributes](#attributes)
-- [ ] [Standard Library](#standard-library)
+- [Core Syntax & Basic Types](#core-syntax)
+- [Variables & Mutability](#variables-mutability)
+- [Operators](#operators)
+- [Functions](#functions)
+- [Control Flow](#control-flow)
+- [Ownership & Borrowing](#ownership-borrowing)
+- [Lifetimes](#lifetimes)
+- [Type System & Inference](#type-system-inference)
+- [Generics](#generics)
+- [Pattern Matching](#pattern-matching)
+- [Error Handling](#error-handling)
+- [Object-Oriented Programming](#object-oriented-programming)
+- [Traits & Interfaces](#traits-interfaces)
+- [Smart Pointers](#smart-pointers)
+- [Functional Programming](#functional-programming)
+- [Module System](#module-system)
+- [Collections](#collections)
+- [Iterators](#iterators)
+- [Concurrency](#concurrency)
+- [Unsafe Code](#unsafe-code)
+- [Macros](#macros)
+- [Attributes](#attributes)
+- [Testing](#testing)
+- [Standard Library](#standard-library)
 
 ---
 
 <a id="core-syntax"></a>
-### Core Syntax & Basic Types
-#### [ ]primitive types
-```rust
+## Core Syntax & Basic Types
+
+### [ ] Primitive Types
+```nova
 // Integer types (signed and unsigned)
 let a: i8 = 127           // 8-bit signed integer
 let b: i16 = 32767        // 16-bit signed integer
@@ -60,8 +102,8 @@ let mut name = String::from("Nova")
 let unit: () = ()
 ```
 
-#### [ ]type inference
-```rust
+### [ ] Type Inference
+```nova
 // Type inference - compiler deduces types
 let x = 42              // Inferred as i32
 let y = 3.14            // Inferred as f64
@@ -73,8 +115,8 @@ let sum = x + 10        // x is i32, sum is i32
 ```
 
 
-#### [ ]numeric literals
-```rust
+### [ ] Numeric Literals
+```nova
 // Decimal
 let decimal = 98_222    // Underscores for readability
 
@@ -95,13 +137,103 @@ let float1 = 2.5
 let float2 = 1e6        // Scientific notation
 let float3 = 3.14_f32   // Explicit type suffix
 ```
+
+### [ ] Comments
+```nova
+// Single-line comment
+
+/* 
+   Multi-line comment
+   can span multiple lines
+*/
+
+/// Documentation comment for the following item
+/// Supports markdown formatting
+/// 
+/// # Examples
+/// ```
+/// let x = 5
+/// ```
+pub func documented_function() {
+    // Implementation
+}
+
+//! Module-level documentation comment
+//! Describes the current module
+```
+
+### [ ] Enums
+```nova
+// Basic enum
+enum Direction {
+    North,
+    South,
+    East,
+    West
+}
+
+let dir = Direction::North
+
+// Enum with values
+enum Color {
+    Red = 0xFF0000,
+    Green = 0x00FF00,
+    Blue = 0x0000FF
+}
+
+// Enum with associated data
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32)
+}
+
+let msg = Message::Move { x: 10, y: 20 }
+
+// Enum methods
+impl Direction {
+    func is_vertical(&self) -> bool {
+        match self {
+            Direction::North | Direction::South => true,
+            _ => false
+        }
+    }
+}
+```
+
+### [ ] Ranges
+```nova
+// Exclusive range (end not included)
+let range = 0..10       // 0, 1, 2, ..., 9
+
+// Inclusive range (end included)
+let inclusive = 0..=10  // 0, 1, 2, ..., 10
+
+// Range in for loop
+for i in 0..5 {
+    println("{}", i)
+}
+
+// Range for slicing
+let arr = [0, 1, 2, 3, 4, 5]
+let slice = &arr[1..4]   // [1, 2, 3]
+let slice = &arr[..3]    // [0, 1, 2] - from start
+let slice = &arr[3..]    // [3, 4, 5] - to end
+let slice = &arr[..]     // [0, 1, 2, 3, 4, 5] - full
+
+// Range bounds checking
+if (0..10).contains(&5) {
+    println("5 is in range")
+}
+```
 ---
 
 <a id="variables-mutability"></a>
-### Variables & Mutability
+## Variables & Mutability
 
-#### [ ]immutable by default
-```rust
+### [ ] Immutable by Default
+```nova
 // Immutable variable (default)
 let x = 5
 // x = 6  // ERROR: cannot assign twice to immutable variable
@@ -116,8 +248,8 @@ const MAX_POINTS: i32 = 100_000
 const PI: f64 = 3.14159265359
 ```
 
-#### [ ]shadowing
-```rust
+### [ ] Shadowing
+```nova
 let x = 5
 let x = x + 1        // Shadow previous x
 let x = x * 2        // Shadow again (x is now 12)
@@ -127,8 +259,8 @@ let spaces = "   "
 let spaces = spaces.len()  // Now an integer
 ```
 
-#### [ ]destructing
-```rust
+### [ ] Destructuring
+```nova
 // Tuple destructuring
 let (x, y) = (10, 20)
 
@@ -142,10 +274,118 @@ let Point { x, y } = point
 ```
 ---
 
+<a id="operators"></a>
+## Operators
+
+### [ ] Arithmetic Operators
+```nova
+let a = 10
+let b = 3
+
+let sum = a + b         // Addition: 13
+let diff = a - b        // Subtraction: 7
+let prod = a * b        // Multiplication: 30
+let quot = a / b        // Division: 3 (integer division)
+let rem = a % b         // Remainder/Modulo: 1
+
+// Compound assignment
+let mut x = 10
+x += 5      // x = x + 5 -> 15
+x -= 3      // x = x - 3 -> 12
+x *= 2      // x = x * 2 -> 24
+x /= 4      // x = x / 4 -> 6
+x %= 4      // x = x % 4 -> 2
+
+// Floating point division
+let f: f64 = 10.0 / 3.0  // 3.333...
+```
+
+### [ ] Comparison Operators
+```nova
+let a = 5
+let b = 10
+
+a == b      // Equal: false
+a != b      // Not equal: true
+a < b       // Less than: true
+a <= b      // Less than or equal: true
+a > b       // Greater than: false
+a >= b      // Greater than or equal: false
+
+// Chained comparisons (if supported)
+let x = 5
+let valid = 0 < x && x < 10  // true
+```
+
+### [ ] Logical Operators
+```nova
+let t = true
+let f = false
+
+t && f      // Logical AND: false
+t || f      // Logical OR: true
+!t          // Logical NOT: false
+
+// Short-circuit evaluation
+let result = false && expensive_function()  // expensive_function not called
+let result = true || expensive_function()   // expensive_function not called
+```
+
+### [ ] Bitwise Operators
+```nova
+let a: u8 = 0b1010      // 10
+let b: u8 = 0b1100      // 12
+
+a & b       // Bitwise AND: 0b1000 (8)
+a | b       // Bitwise OR: 0b1110 (14)
+a ^ b       // Bitwise XOR: 0b0110 (6)
+!a          // Bitwise NOT: 0b11110101 (245 for u8)
+
+a << 2      // Left shift: 0b101000 (40)
+a >> 1      // Right shift: 0b0101 (5)
+
+// Compound assignment
+let mut x: u8 = 0b1010
+x &= 0b1100     // x = x & 0b1100
+x |= 0b0001     // x = x | 0b0001
+x ^= 0b1111     // x = x ^ 0b1111
+x <<= 1         // x = x << 1
+x >>= 2         // x = x >> 2
+```
+
+### [ ] Other Operators
+```nova
+// Reference operators
+let x = 5
+let r = &x          // Immutable reference
+let mr = &mut x     // Mutable reference
+let v = *r          // Dereference
+
+// Type cast
+let i: i32 = 42
+let f: f64 = i as f64
+
+// Range operators (see Ranges section)
+0..10       // Exclusive range
+0..=10      // Inclusive range
+
+// Member access
+struct Point { x: i32, y: i32 }
+let p = Point { x: 1, y: 2 }
+let x = p.x         // Field access
+
+// Path operator
+use std::collections::HashMap  // Module path
+let opt = Option::Some(5)      // Enum variant
+```
+
+---
+
 <a id="functions"></a>
-### Functions
-#### [ ]basic functions
-```rust
+## Functions
+
+### [ ] Basic Functions
+```nova
 // Function with explicit return type
 func add(a: i32, b: i32) -> i32 {
     return a + b
@@ -167,8 +407,8 @@ func print_point(x: i32, y: i32, z: i32) {
 }
 ```
 
-#### [ ]default argument
-```rust
+### [ ] Default Arguments
+```nova
 func power(base: i32, exponent: i32 = 2) -> i32 {
     let mut result = 1
     for _ in 0..exponent {
@@ -182,8 +422,8 @@ let cubed = power(5, 3)       // Explicit exponent -> 125
 ```
 
 
-#### [ ]function overloading
-```rust
+### [ ] Function Overloading
+```nova
 // Overload based on parameter count
 func print(x: i32) {
     println("{}", x)
@@ -199,8 +439,8 @@ func max<T: Ord>(a: T, b: T) -> T {
 }
 ```
 
-#### [ ]higher-order function
-```rust
+### [ ] Higher-Order Functions
+```nova
 // Function taking another function as parameter
 func apply_twice(f: fn(i32) -> i32, x: i32) -> i32 {
     f(f(x))
@@ -214,8 +454,8 @@ let result = apply_twice(increment, 5)  // 7
 ```
 
 
-#### [ ]closures
-```rust
+### [ ] Closures
+```nova
 // Closures (anonymous functions)
 let add_one = |x| x + 1
 let sum = |a, b| a + b
@@ -236,11 +476,10 @@ let process = |x| {
 ---
 
 <a id="control-flow"></a>
-### Control Flow
+## Control Flow
 
-
-#### [ ]ifExpressions
-```rust
+### [ ] If Expressions
+```nova
 // If as statement
 let number = 6
 if number % 2 == 0 {
@@ -267,8 +506,8 @@ let grade = if score >= 90 {
     'F'
 }
 ```
-#### [ ]loops
-```rust
+### [ ] Loops
+```nova
 // Loop (infinite)
 loop {
     println("Forever!")
@@ -317,8 +556,8 @@ let result = loop {
 }
 ```
 
-#### [ ]continue
-```rust
+### [ ] Continue Statement
+```nova
 for i in 0..10 {
     if i % 2 == 0 {
         continue  // Skip even numbers
@@ -330,12 +569,10 @@ for i in 0..10 {
 ---
 
 <a id="ownership-borrowing"></a>
-### Ownership & Borrowing
+## Ownership & Borrowing
 
-
-
-#### [ ]ownership rules
-```rust
+### [ ] Ownership Rules
+```nova
 // Rule 1: Each value has an owner
 let s1 = String::from("hello")  // s1 owns the string
 
@@ -351,8 +588,8 @@ let s2 = s1                     // s1 moved to s2
 ```
 
 
-#### [ ]move semantics
-```rust
+### [ ] Move Semantics
+```nova
 func take_ownership(s: String) {
     println("{}", s)
 }  // s is dropped here
@@ -362,8 +599,8 @@ take_ownership(s)
 // println("{}", s)  // ERROR: s was moved
 ```
 
-#### [ ]borrowing(reference)
-```rust
+### [ ] Borrowing (References)
+```nova
 // Immutable borrow
 func calculate_length(s: &String) -> usize {
     s.len()  // Can read but not modify
@@ -383,8 +620,8 @@ append_world(&mut s)
 println("{}", s)  // "hello, world"
 ```
 
-#### [ ]borrowing rulse
-```rust
+### [ ] Borrowing Rules
+```nova
 // Can have multiple immutable borrows
 let s = String::from("hello")
 let r1 = &s
@@ -411,9 +648,8 @@ func dangle() -> &String {
 }
 ```
 
-#### [ ]reference vs raw pointer
-
-```rust
+### [ ] References vs Raw Pointers
+```nova
 // Safe reference (ownership checked)
 let x = 5
 let r = &x  // Immutable reference
@@ -422,18 +658,102 @@ let r = &x  // Immutable reference
 unsafe {
     let r = &x as *const i32
     let mut_r = &mut x as *mut i32
-    println!("{}", *r)  // Dereference in unsafe block
+    println("{}", *r)  // Dereference in unsafe block
 }
 ```
 
 ---
 
+<a id="lifetimes"></a>
+## Lifetimes
+
+### [ ] Lifetime Annotations
+```nova
+// Lifetime annotation syntax
+// 'a is a lifetime parameter
+
+// Function with lifetime parameter
+func longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+// The returned reference is valid as long as both inputs are valid
+let s1 = String::from("long string")
+let s2 = String::from("short")
+let result = longest(&s1, &s2)
+```
+
+### [ ] Lifetime in Structs
+```nova
+// Struct holding a reference needs lifetime annotation
+struct Excerpt<'a> {
+    part: &'a str
+}
+
+let novel = String::from("Call me Ishmael. Some years ago...")
+let first_sentence = novel.split('.').next().unwrap()
+let excerpt = Excerpt { part: first_sentence }
+
+// Excerpt cannot outlive the string it references
+```
+
+### [ ] Lifetime Elision Rules
+```nova
+// Compiler can infer lifetimes in common cases
+
+// Rule 1: Each reference parameter gets its own lifetime
+func first_word(s: &str) -> &str  // Compiler infers: func first_word<'a>(s: &'a str) -> &'a str
+
+// Rule 2: If there's exactly one input lifetime, it's assigned to all output lifetimes
+func get_ref(s: &String) -> &str  // Output lifetime matches input
+
+// Rule 3: If one of the parameters is &self or &mut self, its lifetime is assigned to output
+impl MyStruct {
+    func get_part(&self) -> &str {  // Output lifetime is 'self
+        &self.data
+    }
+}
+```
+
+### [ ] Static Lifetime
+```nova
+// 'static lifetime - lives for entire program duration
+let s: &'static str = "I have a static lifetime"
+
+// String literals always have 'static lifetime
+const MESSAGE: &'static str = "Hello, World!"
+
+// Generic with static bound
+func print_static<T: 'static>(t: T) {
+    println("{:?}", t)
+}
+```
+
+### [ ] Multiple Lifetimes
+```nova
+// Multiple lifetime parameters
+func complex<'a, 'b>(x: &'a str, y: &'b str) -> &'a str {
+    x  // Returns reference with lifetime 'a
+}
+
+// Lifetime bounds
+func longer_than<'a, 'b: 'a>(x: &'a str, y: &'b str) -> &'a str {
+    if x.len() > y.len() { x } else { y }
+}
+// 'b: 'a means 'b outlives 'a
+```
+
+---
+
 <a id="type-system-inference"></a>
-### Type System & Inference
+## Type System & Inference
 
-#### [ ]type annotations
-
-```rust
+### [ ] Type Annotations
+```nova
 // Explicit type annotations
 let x: i32 = 5
 let y: f64 = 3.14
@@ -445,8 +765,8 @@ let y = 3.14       // f64 inferred
 let flag = true    // bool inferred
 ```
 
-#### [ ]compound types
-```rust
+### [ ] Compound Types
+```nova
 // Tuples (heterogeneous, fixed size)
 let tuple: (i32, f64, bool) = (42, 3.14, true)
 let (x, y, z) = tuple  // Destructuring
@@ -465,8 +785,8 @@ let slice: &[i32] = &array[1..4]  // [2, 3, 4]
 ```
 
 
-#### [ ]type aliases
-```rust
+### [ ] Type Aliases
+```nova
 // Type alias
 type Kilometers = i32
 type Point = (i32, i32)
@@ -474,8 +794,8 @@ type Point = (i32, i32)
 let distance: Kilometers = 100
 let origin: Point = (0, 0)
 ```
-#### [ ]never type
-```rust
+### [ ] Never Type
+```nova
 // Never type (!) - function never returns
 func panic_now() -> ! {
     panic("This function never returns")
@@ -490,10 +810,10 @@ func infinite_loop() -> ! {
 ---
 
 <a id="generics"></a>
-### Generics
+## Generics
 
-#### [ ]generic function
-```rust
+### [ ] Generic Functions
+```nova
 // Generic function
 func identity<T>(x: T) -> T {
     x
@@ -516,8 +836,8 @@ func max<T: Ord>(a: T, b: T) -> T {
 ```
 
 
-#### [ ]generic structs
-```rust
+### [ ] Generic Structs
+```nova
 // Generic struct
 struct Point<T> {
     x: T,
@@ -536,8 +856,8 @@ struct Pair<T, U> {
 let pair = Pair { first: 5, second: "hello" }
 ```
 
-#### [ ]generic enums
-```rust
+### [ ] Generic Enums
+```nova
 // Option<T> - built-in generic enum
 enum Option<T> {
     Some(T),
@@ -557,8 +877,8 @@ let success: Result<i32, str> = Result::Ok(42)
 let failure: Result<i32, str> = Result::Err("error")
 ```
 
-#### [ ]generic methods
-```rust
+### [ ] Generic Methods
+```nova
 struct Point<T> {
     x: T,
     y: T
@@ -586,8 +906,8 @@ impl<T> Point<T> {
 }
 ```
 
-#### [ ]monomorphization
-```rust
+### [ ] Monomorphization
+```nova
 // Compiler generates specific versions for each type
 func print_type<T>(value: T) {
     println("{}", value)
@@ -603,10 +923,10 @@ print_type("hi")    // Generates: print_type_str
 ---
 
 <a id="pattern-matching"></a>
-### Pattern Matching
+## Pattern Matching
 
-#### [ ]match expression
-```rust
+### [ ] Match Expression
+```nova
 // Basic match
 let number = 7
 
@@ -634,8 +954,8 @@ match (x, y) {
 }
 ```
 
-#### [ ]destructuring
-```rust
+### [ ] Destructuring in Patterns
+```nova
 // Destructure structs
 struct Point { x: i32, y: i32 }
 
@@ -666,9 +986,8 @@ match msg {
 }
 ```
 
-#### [ ]match guards
-
-```rust
+### [ ] Match Guards
+```nova
 let number = 4
 
 match number {
@@ -685,8 +1004,8 @@ match number {
 }
 ```
 
-#### [ ]ifLet and whileLet
-```rust
+### [ ] If Let and While Let
+```nova
 // If let (shorthand for single pattern match)
 let some_value = Option::Some(5)
 
@@ -704,9 +1023,8 @@ while let Option::Some(top) = stack.pop() {
 }
 ```
 
-#### [ ]pattern matching in function parameters
-
-```rust
+### [ ] Pattern Matching in Function Parameters
+```nova
 // Destructure in function parameters
 func print_point((x, y): (i32, i32)) {
     println("Point at ({}, {})", x, y)
@@ -724,11 +1042,10 @@ pairs.iter().for_each(|(x, y)| {
 ---
 
 <a id="error-handling"></a>
-### Error Handling
+## Error Handling
 
-
-#### [ ]option<T>
-```rust
+### [ ] Option\<T\>
+```nova
 // Option - represents optional value
 enum Option<T> {
     Some(T),
@@ -760,8 +1077,8 @@ let is_none = x.is_none()       // false
 ```
 
 
-#### [ ]result<T,E>
-```rust
+### [ ] Result\<T, E\>
+```nova
 // Result - represents success or failure
 enum Result<T, E> {
     Ok(T),
@@ -790,8 +1107,8 @@ let is_ok = x.is_ok()           // true
 let is_err = x.is_err()         // false
 ```
 
-#### [ ]panic(unrecoverable errors)
-```rust
+### [ ] Panic (Unrecoverable Errors)
+```nova
 // panic! - terminate program
 func divide(a: i32, b: i32) -> i32 {
     if b == 0 {
@@ -809,8 +1126,8 @@ func safe_divide(a: i32, b: i32) -> i32 {
 }
 ```
 
-#### [ ]custom error types
-```rust
+### [ ] Custom Error Types
+```nova
 // Custom error enum
 enum MathError {
     DivisionByZero,
@@ -838,15 +1155,92 @@ func open_file(path: str) -> Result<File, FileError> {
 }
 ```
 
+### [ ] Error Propagation (`?` Operator)
+```nova
+// The ? operator propagates errors automatically
+func read_username_from_file() -> Result<String, IOError> {
+    let mut file = File::open("username.txt")?  // Returns early if Err
+    let mut username = String::new()
+    file.read_to_string(&mut username)?         // Returns early if Err
+    Ok(username)
+}
+
+// Equivalent to:
+func read_username_verbose() -> Result<String, IOError> {
+    let file_result = File::open("username.txt")
+    let mut file = match file_result {
+        Ok(f) => f,
+        Err(e) => return Err(e)
+    }
+    let mut username = String::new()
+    match file.read_to_string(&mut username) {
+        Ok(_) => Ok(username),
+        Err(e) => Err(e)
+    }
+}
+
+// Chaining with ?
+func get_user_data() -> Result<UserData, Error> {
+    let config = read_config()?
+    let user_id = config.get_user_id()?
+    let user = fetch_user(user_id)?
+    Ok(user)
+}
+
+// Using ? with Option
+func get_first_char(s: &str) -> Option<char> {
+    s.lines().next()?.chars().next()
+}
+
+// Converting errors with ?
+func read_number() -> Result<i32, String> {
+    let content = fs::read_to_string("number.txt")
+        .map_err(|e| e.to_string())?
+    let number = content.trim().parse::<i32>()
+        .map_err(|e| e.to_string())?
+    Ok(number)
+}
+```
+
+### [ ] Error Handling Best Practices
+```nova
+// Use Result for recoverable errors
+func validate_age(age: i32) -> Result<i32, String> {
+    if age < 0 {
+        Err(String::from("Age cannot be negative"))
+    } else if age > 150 {
+        Err(String::from("Age seems unrealistic"))
+    } else {
+        Ok(age)
+    }
+}
+
+// Use Option for optional values
+func find_user(id: i32) -> Option<User> {
+    // Returns None if not found, Some(user) if found
+}
+
+// Use panic! only for unrecoverable errors
+func initialize() {
+    let config = load_config().expect("Config file is required")
+    // If config fails to load, the program cannot continue
+}
+
+// Provide context with error messages
+func process_file(path: &str) -> Result<Data, ProcessError> {
+    let file = File::open(path)
+        .map_err(|e| ProcessError::FileOpen { path: path.to_string(), source: e })?
+    // ...
+}
+```
 
 ---
 
 <a id="object-oriented-programming"></a>
-### Object-Oriented Programming
+## Object-Oriented Programming
 
-
-#### [ ]structs
-```
+### [ ] Structs
+```nova
 // Basic struct
 struct Person {
     name: String,
@@ -879,8 +1273,8 @@ struct Empty
 ```
 
 
-#### [ ]methods
-```rust
+### [ ] Methods
+```nova
 struct Rectangle {
     width: u32,
     height: u32
@@ -918,9 +1312,8 @@ let mut rect2 = Rectangle::new(5, 10)
 rect2.scale(2)  // Now 10x20
 ```
 
-#### [ ]classes(inheritance)
-
-```rust
+### [ ] Classes (Inheritance)
+```nova
 // Base class
 class Animal {
     name: String,
@@ -973,9 +1366,8 @@ let animal: &Animal = &dog  // Upcast
 println("{}", animal.speak())  // Calls Dog::speak
 ```
 
-#### [ ]visibility
-
-```rust
+### [ ] Visibility
+```nova
 // Public struct with private fields
 pub struct User {
     pub username: String,    // Public field
@@ -1007,11 +1399,10 @@ impl User {
 ---
 
 <a id="traits-interfaces"></a>
-### Traits & Interfaces
+## Traits & Interfaces
 
-#### [ ]defining traits
-
-```rust
+### [ ] Defining Traits
+```nova
 // Basic trait
 trait Speak {
     func speak(&self) -> String;
@@ -1042,9 +1433,8 @@ trait MathConstants {
 }
 ```
 
-#### [ ]implementing traits
-
-```rust
+### [ ] Implementing Traits
+```nova
 struct Dog {
     name: String
 }
@@ -1059,7 +1449,7 @@ impl Greet for Dog {
     // Use default implementation for greet
     // Override say_goodbye
     func say_goodbye(&self) -> String {
-        format!("{} says goodbye", self.name)
+        format("{} says goodbye", self.name)
     }
 }
 
@@ -1070,9 +1460,8 @@ println("{}", dog.greet())        // "Hello" (default)
 println("{}", dog.say_goodbye())  // "Buddy says goodbye"
 ```
 
-#### [ ]trait bounds
-
-```rust
+### [ ] Trait Bounds
+```nova
 // Function with trait bound
 func print_speak<T: Speak>(item: &T) {
     println("{}", item.speak())
@@ -1094,9 +1483,8 @@ func complex<T, U>(t: &T, u: &U) -> i32
 }
 ```
 
-#### [ ]built-in traits
-
-```rust
+### [ ] Built-in Traits
+```nova
 // Clone - create deep copy
 #[derive(Clone)]
 struct Point {
@@ -1146,9 +1534,8 @@ struct Person {
 }
 ```
 
-#### [ ]trait objects(dynamic dispatch)
-
-```rust
+### [ ] Trait Objects (Dynamic Dispatch)
+```nova
 // Trait object - runtime polymorphism
 trait Draw {
     func draw(&self);
@@ -1187,12 +1574,146 @@ for shape in shapes {
 ```
 ---
 
+<a id="smart-pointers"></a>
+## Smart Pointers
+
+### [ ] Box\<T\> (Heap Allocation)
+```nova
+// Box - allocate data on the heap
+let boxed = Box::new(5)
+println("Value: {}", *boxed)  // Dereference to access value
+
+// Useful for recursive types
+enum List {
+    Cons(i32, Box<List>),
+    Nil
+}
+
+let list = List::Cons(1, 
+    Box::new(List::Cons(2, 
+        Box::new(List::Cons(3, 
+            Box::new(List::Nil))))));
+
+// Box for trait objects
+let drawable: Box<dyn Draw> = Box::new(Circle { radius: 5.0 })
+drawable.draw()
+```
+
+### [ ] Rc\<T\> (Reference Counting)
+```nova
+use std::rc::Rc
+
+// Rc - multiple ownership through reference counting
+let data = Rc::new(vec![1, 2, 3])
+
+let clone1 = Rc::clone(&data)  // Increment reference count
+let clone2 = Rc::clone(&data)  // Increment again
+
+println("Reference count: {}", Rc::strong_count(&data))  // 3
+
+// When all Rc instances go out of scope, data is dropped
+
+// Shared ownership example
+struct Node {
+    value: i32,
+    parent: Option<Rc<Node>>
+}
+
+let parent = Rc::new(Node { value: 1, parent: None })
+let child1 = Node { value: 2, parent: Some(Rc::clone(&parent)) }
+let child2 = Node { value: 3, parent: Some(Rc::clone(&parent)) }
+```
+
+### [ ] RefCell\<T\> (Interior Mutability)
+```nova
+use std::cell::RefCell
+
+// RefCell - mutable borrows checked at runtime
+let data = RefCell::new(5)
+
+// Borrow mutably even though RefCell is not mut
+*data.borrow_mut() += 1
+println("Value: {}", *data.borrow())  // 6
+
+// Multiple immutable borrows OK
+let r1 = data.borrow()
+let r2 = data.borrow()
+
+// But this would panic at runtime:
+// let r1 = data.borrow()
+// let r2 = data.borrow_mut()  // PANIC: already borrowed
+
+// Common pattern: Rc<RefCell<T>> for shared mutable data
+let shared = Rc::new(RefCell::new(vec![1, 2, 3]))
+let clone1 = Rc::clone(&shared)
+let clone2 = Rc::clone(&shared)
+
+clone1.borrow_mut().push(4)
+clone2.borrow_mut().push(5)
+// shared now contains [1, 2, 3, 4, 5]
+```
+
+### [ ] Weak\<T\> (Weak References)
+```nova
+use std::rc::{Rc, Weak}
+
+// Weak - non-owning reference, doesn't prevent deallocation
+struct Node {
+    value: i32,
+    parent: RefCell<Weak<Node>>,
+    children: RefCell<Vec<Rc<Node>>>
+}
+
+// Prevents reference cycles that would cause memory leaks
+let parent = Rc::new(Node {
+    value: 1,
+    parent: RefCell::new(Weak::new()),
+    children: RefCell::new(vec![])
+})
+
+let child = Rc::new(Node {
+    value: 2,
+    parent: RefCell::new(Rc::downgrade(&parent)),  // Weak reference
+    children: RefCell::new(vec![])
+})
+
+parent.children.borrow_mut().push(Rc::clone(&child))
+
+// Access weak reference
+if let Some(p) = child.parent.borrow().upgrade() {
+    println("Parent value: {}", p.value)
+}
+```
+
+### [ ] Cell\<T\> (Copy Types Interior Mutability)
+```nova
+use std::cell::Cell
+
+// Cell - interior mutability for Copy types
+let cell = Cell::new(5)
+
+cell.set(10)                    // No borrow needed
+let value = cell.get()          // Returns copy, not reference
+
+// Useful in structs
+struct Counter {
+    count: Cell<i32>
+}
+
+impl Counter {
+    func increment(&self) {     // &self, not &mut self
+        self.count.set(self.count.get() + 1)
+    }
+}
+```
+
+---
+
 <a id="functional-programming"></a>
-### Functional Programming
+## Functional Programming
 
-#### [ ]first-class functions
-
-```rust
+### [ ] First-Class Functions
+```nova
 // Function as value
 let add = |a, b| a + b
 let result = add(5, 3)
@@ -1209,9 +1730,8 @@ let add_five = make_adder(5)
 let result = add_five(10)  // 15
 ```
 
-#### [ ]closures
-
-```rust
+### [ ] Closures (Captures)
+```nova
 // Capture by reference
 let x = 10
 let print_x = || println("{}", x)  // Borrows x
@@ -1236,47 +1756,955 @@ consume()
 let add = |a: i32, b: i32| -> i32 { a + b }
 ```
 
-#### [ ]higher-order functions
+### [ ] Higher-Order Functions with Collections
+```nova
+// Map - transform each element
+let numbers = [1, 2, 3, 4, 5]
+let doubled = numbers.iter().map(|x| x * 2).collect()  // [2, 4, 6, 8, 10]
 
-```rust
+// Filter - keep elements matching predicate
+let evens = numbers.iter().filter(|x| x % 2 == 0).collect()  // [2, 4]
 
+// Fold/Reduce - accumulate into single value
+let sum = numbers.iter().fold(0, |acc, x| acc + x)  // 15
+
+// Chaining operations
+let result = numbers.iter()
+    .filter(|x| x % 2 == 1)
+    .map(|x| x * x)
+    .fold(0, |acc, x| acc + x)  // 1 + 9 + 25 = 35
 ```
+
 ---
 
 <a id="module-system"></a>
-### Module System
+## Module System
+
+### [ ] Defining Modules
+```nova
+// In file: lib.nova
+mod math {
+    pub func add(a: i32, b: i32) -> i32 {
+        a + b
+    }
+    
+    // Private by default
+    func helper() -> i32 {
+        42
+    }
+    
+    // Nested modules
+    pub mod advanced {
+        pub func power(base: i32, exp: i32) -> i32 {
+            let mut result = 1
+            for _ in 0..exp {
+                result *= base
+            }
+            result
+        }
+    }
+}
+```
+
+### [ ] Using Modules
+```nova
+// Import entire module
+use math
+
+let sum = math::add(1, 2)
+
+// Import specific items
+use math::add
+use math::advanced::power
+
+let sum = add(1, 2)
+let squared = power(2, 8)
+
+// Import with alias
+use math::advanced as adv
+
+let result = adv::power(2, 10)
+
+// Glob import (use sparingly)
+use math::*
+```
+
+### [ ] File-Based Modules
+```nova
+// File structure:
+// src/
+//   main.nova
+//   utils.nova
+//   math/
+//     mod.nova
+//     geometry.nova
+
+// In main.nova:
+mod utils           // Loads src/utils.nova
+mod math            // Loads src/math/mod.nova
+
+use utils::helper
+use math::geometry::Circle
+```
+
+### [ ] Re-exports
+```nova
+mod internal {
+    pub mod types {
+        pub struct Config {
+            pub name: String,
+            pub value: i32
+        }
+    }
+}
+
+// Re-export for cleaner API
+pub use internal::types::Config
+```
 
 ---
 
 <a id="collections"></a>
-### Collections
+## Collections
+
+### [ ] Vec (Dynamic Array)
+```nova
+// Create vectors
+let mut numbers: Vec<i32> = Vec::new()
+let numbers = vec![1, 2, 3, 4, 5]
+
+// Add elements
+numbers.push(6)
+numbers.push(7)
+
+// Access elements
+let first = numbers[0]         // Panics if out of bounds
+let maybe = numbers.get(0)     // Returns Option<&i32>
+
+// Remove elements
+let last = numbers.pop()       // Returns Option<i32>
+let second = numbers.remove(1) // Remove at index
+
+// Iteration
+for n in &numbers {
+    println("{}", n)
+}
+
+// Length and capacity
+let len = numbers.len()
+let cap = numbers.capacity()
+numbers.reserve(100)  // Pre-allocate
+```
+
+### [ ] HashMap
+```nova
+use collections::HashMap
+
+// Create hashmap
+let mut scores: HashMap<String, i32> = HashMap::new()
+
+// Insert
+scores.insert(String::from("Alice"), 100)
+scores.insert(String::from("Bob"), 85)
+
+// Access
+let alice_score = scores.get(&String::from("Alice"))  // Option<&i32>
+
+// Update
+scores.insert(String::from("Alice"), 95)  // Overwrites
+
+// Entry API
+scores.entry(String::from("Charlie")).or_insert(0)
+
+// Iteration
+for (name, score) in &scores {
+    println("{}: {}", name, score)
+}
+```
+
+### [ ] HashSet
+```nova
+use collections::HashSet
+
+let mut seen: HashSet<i32> = HashSet::new()
+
+// Add elements
+seen.insert(1)
+seen.insert(2)
+seen.insert(1)  // Duplicate, ignored
+
+// Check membership
+if seen.contains(&1) {
+    println("Found 1")
+}
+
+// Set operations
+let a: HashSet<i32> = [1, 2, 3].into()
+let b: HashSet<i32> = [2, 3, 4].into()
+
+let union = a.union(&b)          // {1, 2, 3, 4}
+let intersection = a.intersection(&b)  // {2, 3}
+let difference = a.difference(&b)      // {1}
+```
 
 ---
 
 <a id="iterators"></a>
-### Iterators
+## Iterators
+
+### [ ] Iterator Trait
+```nova
+trait Iterator {
+    type Item
+    
+    func next(&mut self) -> Option<Self::Item>
+}
+```
+
+### [ ] Creating Iterators
+```nova
+// From collections
+let numbers = [1, 2, 3, 4, 5]
+let iter = numbers.iter()       // Iterator over &i32
+let iter_mut = numbers.iter_mut()  // Iterator over &mut i32
+let into_iter = numbers.into_iter() // Takes ownership
+
+// Ranges
+let range = 0..10       // 0 to 9
+let inclusive = 0..=10  // 0 to 10
+```
+
+### [ ] Iterator Adapters
+```nova
+let numbers = vec![1, 2, 3, 4, 5]
+
+// map - transform elements
+let squared = numbers.iter().map(|x| x * x)
+
+// filter - keep matching elements
+let evens = numbers.iter().filter(|x| *x % 2 == 0)
+
+// take - limit number of elements
+let first_three = numbers.iter().take(3)
+
+// skip - skip first n elements
+let after_two = numbers.iter().skip(2)
+
+// enumerate - add index
+for (i, n) in numbers.iter().enumerate() {
+    println("{}: {}", i, n)
+}
+
+// zip - combine two iterators
+let a = [1, 2, 3]
+let b = [4, 5, 6]
+let pairs = a.iter().zip(b.iter())  // [(1,4), (2,5), (3,6)]
+
+// flatten - flatten nested iterators
+let nested = vec![vec![1, 2], vec![3, 4]]
+let flat = nested.iter().flatten()  // [1, 2, 3, 4]
+
+// chain - concatenate iterators
+let combined = a.iter().chain(b.iter())
+```
+
+### [ ] Consuming Iterators
+```nova
+let numbers = vec![1, 2, 3, 4, 5]
+
+// collect - gather into collection
+let doubled: Vec<i32> = numbers.iter().map(|x| x * 2).collect()
+
+// sum - add all elements
+let total: i32 = numbers.iter().sum()
+
+// product - multiply all elements
+let factorial: i32 = (1..=5).product()  // 120
+
+// count - count elements
+let count = numbers.iter().count()
+
+// find - first matching element
+let first_even = numbers.iter().find(|x| *x % 2 == 0)
+
+// any/all - check conditions
+let has_even = numbers.iter().any(|x| x % 2 == 0)  // true
+let all_positive = numbers.iter().all(|x| *x > 0)   // true
+
+// min/max
+let minimum = numbers.iter().min()
+let maximum = numbers.iter().max()
+```
 
 ---
 
 <a id="concurrency"></a>
-### Concurrency
+## Concurrency
+
+### [ ] Threads
+```nova
+use std::thread
+
+// Spawn a new thread
+let handle = thread::spawn(|| {
+    println("Hello from thread!")
+})
+
+// Wait for thread to complete
+handle.join()
+
+// Move data into thread
+let data = vec![1, 2, 3]
+let handle = thread::spawn(move || {
+    println("Data: {:?}", data)
+})
+```
+
+### [ ] Message Passing
+```nova
+use std::sync::mpsc
+
+// Create channel
+let (sender, receiver) = mpsc::channel()
+
+thread::spawn(move || {
+    sender.send(42)
+})
+
+let received = receiver.recv()  // Blocks until message received
+println("Got: {}", received)
+
+// Multiple producers
+let (tx, rx) = mpsc::channel()
+for i in 0..5 {
+    let tx_clone = tx.clone()
+    thread::spawn(move || {
+        tx_clone.send(i)
+    })
+}
+
+for received in rx {
+    println("Got: {}", received)
+}
+```
+
+### [ ] Shared State
+```nova
+use std::sync::{Arc, Mutex}
+
+// Arc - atomic reference counting
+// Mutex - mutual exclusion
+
+let counter = Arc::new(Mutex::new(0))
+
+let mut handles = vec![]
+
+for _ in 0..10 {
+    let counter = Arc::clone(&counter)
+    let handle = thread::spawn(move || {
+        let mut num = counter.lock()
+        *num += 1
+    })
+    handles.push(handle)
+}
+
+for handle in handles {
+    handle.join()
+}
+
+println("Result: {}", *counter.lock())  // 10
+```
+
+### [ ] Async/Await
+```nova
+// Async function
+async func fetch_data(url: str) -> Result<String, Error> {
+    let response = http::get(url).await?
+    response.text().await
+}
+
+// Running async code
+async func main() {
+    let result = fetch_data("https://example.com").await
+    match result {
+        Ok(data) => println("{}", data),
+        Err(e) => println("Error: {}", e)
+    }
+}
+
+// Concurrent execution
+async func fetch_all() {
+    let (a, b) = join!(
+        fetch_data("https://api1.com"),
+        fetch_data("https://api2.com")
+    )
+}
+```
 
 ---
 
 <a id="unsafe-code"></a>
-### Unsafe Code
+## Unsafe Code
+
+### [ ] Unsafe Blocks
+```nova
+// Unsafe operations require unsafe block
+unsafe {
+    // Dereference raw pointers
+    let x = 5
+    let ptr = &x as *const i32
+    println("Value: {}", *ptr)
+    
+    // Call unsafe functions
+    dangerous_function()
+    
+    // Access mutable statics
+    COUNTER += 1
+}
+```
+
+### [ ] Raw Pointers
+```nova
+let x = 5
+let y = &mut x
+
+// Create raw pointers (safe)
+let ptr_const: *const i32 = &x
+let ptr_mut: *mut i32 = y
+
+// Dereference (unsafe)
+unsafe {
+    println("const ptr: {}", *ptr_const)
+    *ptr_mut = 10
+}
+```
+
+### [ ] Unsafe Functions
+```nova
+unsafe func dangerous() {
+    // Implementation that requires manual safety guarantees
+}
+
+func safe_wrapper() {
+    // ... safe setup ...
+    unsafe {
+        dangerous()
+    }
+    // ... safe cleanup ...
+}
+```
+
+### [ ] Foreign Function Interface (FFI)
+```nova
+// Declare external C function
+extern "C" {
+    func abs(input: i32) -> i32
+    func strlen(s: *const i8) -> usize
+}
+
+// Call external function
+func main() {
+    unsafe {
+        let result = abs(-5)
+        println("Absolute value: {}", result)
+    }
+}
+
+// Export Nova function to C
+#[no_mangle]
+pub extern "C" func call_from_c() {
+    println("Called from C!")
+}
+```
 
 ---
 
 <a id="macros"></a>
-### Macros
+## Macros
+
+### [ ] Declarative Macros
+```nova
+// Simple macro
+macro vec!($($x:expr),*) {
+    {
+        let mut temp_vec = Vec::new()
+        $(
+            temp_vec.push($x)
+        )*
+        temp_vec
+    }
+}
+
+let numbers = vec![1, 2, 3, 4, 5]
+
+// Macro with different patterns
+macro say_hello!() {
+    println("Hello!")
+}
+
+macro say_hello!($name:expr) {
+    println("Hello, {}!", $name)
+}
+
+say_hello!()           // "Hello!"
+say_hello!("Alice")    // "Hello, Alice!"
+```
+
+### [ ] Built-in Macros
+```nova
+// println - formatted printing
+println("Hello, {}!", name)
+println("{:?}", debug_value)     // Debug format
+println("{:#?}", pretty_debug)   // Pretty debug
+
+// format - create formatted string
+let s = format!("Value: {}", 42)
+
+// assert - runtime assertion
+assert!(condition)
+assert_eq!(a, b)
+assert_ne!(a, b)
+
+// panic - abort with message
+panic!("Something went wrong!")
+
+// dbg - debug printing with location
+let x = dbg!(5 * 2)  // Prints "[file:line] 5 * 2 = 10"
+
+// todo/unimplemented
+func work_in_progress() {
+    todo!("Implement this function")
+}
+```
 
 ---
 
 <a id="attributes"></a>
-### Attributes
+## Attributes
+
+### [ ] Common Attributes
+```nova
+// Derive implementations
+#[derive(Debug, Clone, PartialEq)]
+struct Point {
+    x: i32,
+    y: i32
+}
+
+// Conditional compilation
+#[cfg(target_os = "linux")]
+func linux_only() {
+    // Only compiled on Linux
+}
+
+#[cfg(test)]
+mod tests {
+    // Only compiled during testing
+}
+
+// Allow/deny lints
+#[allow(unused_variables)]
+func example() {
+    let x = 5  // No warning
+}
+
+#[deny(dead_code)]
+mod strict_module {
+    // Unused code is an error
+}
+
+// Documentation
+/// This is a doc comment for the function
+/// 
+/// # Examples
+/// ```
+/// let result = add(1, 2)
+/// assert_eq!(result, 3)
+/// ```
+pub func add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+// Inline hint
+#[inline]
+func small_function() -> i32 {
+    42
+}
+
+#[inline(always)]
+func force_inline() -> i32 {
+    42
+}
+
+// Test function
+#[test]
+func test_addition() {
+    assert_eq!(add(2, 2), 4)
+}
+
+// Mark as deprecated
+#[deprecated(since = "1.0.0", note = "Use new_function instead")]
+func old_function() {
+    // ...
+}
+```
+
+---
+
+<a id="testing"></a>
+## Testing
+
+### [ ] Unit Tests
+```nova
+// Unit tests are placed in the same file as the code
+#[cfg(test)]
+mod tests {
+    use super::*
+    
+    #[test]
+    func test_addition() {
+        assert_eq!(add(2, 2), 4)
+    }
+    
+    #[test]
+    func test_subtraction() {
+        let result = subtract(10, 5)
+        assert_eq!(result, 5)
+    }
+    
+    #[test]
+    #[should_panic]
+    func test_divide_by_zero() {
+        divide(10, 0)  // Should panic
+    }
+    
+    #[test]
+    #[should_panic(expected = "division by zero")]
+    func test_panic_message() {
+        divide(10, 0)  // Checks panic message
+    }
+}
+```
+
+### [ ] Test Assertions
+```nova
+#[test]
+func test_assertions() {
+    // Basic assertion
+    assert!(true)
+    assert!(1 + 1 == 2)
+    
+    // Equality assertions
+    assert_eq!(4, 2 + 2)
+    assert_ne!(4, 2 + 1)
+    
+    // With custom message
+    assert!(result > 0, "Result should be positive, got {}", result)
+    assert_eq!(a, b, "Values should match: {} vs {}", a, b)
+    
+    // Approximate equality for floats
+    let a = 0.1 + 0.2
+    let b = 0.3
+    assert!((a - b).abs() < 1e-10, "Floats should be approximately equal")
+}
+```
+
+### [ ] Test Organization
+```nova
+// Group related tests
+mod math_tests {
+    use super::*
+    
+    mod addition {
+        use super::*
+        
+        #[test]
+        func positive_numbers() {
+            assert_eq!(add(1, 2), 3)
+        }
+        
+        #[test]
+        func negative_numbers() {
+            assert_eq!(add(-1, -2), -3)
+        }
+    }
+    
+    mod subtraction {
+        use super::*
+        
+        #[test]
+        func basic() {
+            assert_eq!(subtract(5, 3), 2)
+        }
+    }
+}
+
+// Ignore slow tests by default
+#[test]
+#[ignore]
+func expensive_test() {
+    // Only runs with: nova test -- --ignored
+}
+```
+
+### [ ] Integration Tests
+```nova
+// Integration tests go in tests/ directory
+// tests/integration_test.nova
+
+use my_crate::*
+
+#[test]
+func test_full_workflow() {
+    let config = Config::load("test_config.toml")
+    let result = process_data(&config)
+    assert!(result.is_ok())
+}
+
+// Setup and teardown
+struct TestContext {
+    temp_dir: PathBuf
+}
+
+impl TestContext {
+    func new() -> Self {
+        let temp_dir = create_temp_dir()
+        TestContext { temp_dir }
+    }
+}
+
+impl Drop for TestContext {
+    func drop(&mut self) {
+        remove_dir_all(&self.temp_dir)
+    }
+}
+
+#[test]
+func test_with_context() {
+    let ctx = TestContext::new()
+    // Test using ctx.temp_dir
+    // Automatically cleaned up when ctx goes out of scope
+}
+```
+
+### [ ] Test Results and Output
+```nova
+// Return Result from tests for cleaner error handling
+#[test]
+func test_with_result() -> Result<(), String> {
+    let data = load_test_data()?
+    let result = process(&data)?
+    assert_eq!(result.count, 42)
+    Ok(())
+}
+
+// Capture test output
+#[test]
+func test_with_output() {
+    println("This only shows if test fails")
+    // Run with: nova test -- --nocapture
+    // to always see output
+}
+```
+
+### [ ] Benchmarks
+```nova
+// Benchmark tests (if supported)
+#[bench]
+func bench_sort(b: &mut Bencher) {
+    let mut data = generate_random_data(1000)
+    b.iter(|| {
+        let mut copy = data.clone()
+        sort(&mut copy)
+    })
+}
+
+// Simple manual timing
+#[test]
+func performance_test() {
+    let start = Instant::now()
+    
+    for _ in 0..1000 {
+        expensive_operation()
+    }
+    
+    let duration = start.elapsed()
+    assert!(duration < Duration::from_secs(1), 
+        "Operation too slow: {:?}", duration)
+}
+```
 
 ---
 
 <a id="standard-library"></a>
-### Standard Library
+## Standard Library
+
+The standard library is organized into modules under `stdlib/`:
+
+### [ ] Core Module (Prelude)
+```nova
+// stdlib/core/prelude.nova - Automatically imported types
+Option<T>       // Optional values (stdlib/core/option.nova)
+Result<T, E>    // Error handling (stdlib/core/result.nova)
+String          // Owned string (stdlib/core/string.nova)
+Vec<T>          // Dynamic array (stdlib/collections/vec.nova)
+Box<T>          // Heap allocation
+Iterator        // Iterator trait (stdlib/core/iter.nova)
+
+// Core traits (stdlib/core/)
+Clone, Copy     // clone.nova
+Default         // default.nova
+Debug, Display  // fmt.nova
+Eq, Ord         // cmp.nova
+Add, Sub, Mul   // ops.nova
+```
+
+### [ ] Collections Module
+```nova
+// stdlib/collections/
+Vec<T>          // vec.nova - Dynamic array
+HashMap<K, V>   // hashmap.nova - Hash map
+HashSet<T>      // hashset.nova - Hash set
+LinkedList<T>   // linkedlist.nova - Doubly-linked list
+Deque<T>        // deque.nova - Double-ended queue
+```
+
+### [ ] I/O Module
+```nova
+// stdlib/io/
+Read            // mod.nova - Read trait
+Write           // mod.nova - Write trait
+File            // file.nova - File operations
+stdin, stdout   // Standard streams
+```
+
+### [ ] Synchronization Module
+```nova
+// stdlib/sync/
+Mutex<T>        // mutex.nova - Mutual exclusion
+RwLock<T>       // rwlock.nova - Reader-writer lock
+Arc<T>          // arc.nova - Atomic reference counting
+```
+
+### [ ] Threading and Async
+```nova
+// stdlib/thread/mod.nova
+spawn()         // Spawn a new thread
+join()          // Wait for thread completion
+sleep()         // Sleep current thread
+
+// stdlib/async/mod.nova
+Future          // Future trait
+async/await     // Async syntax support
+```
+
+### [ ] String Operations
+```nova
+// String creation
+let s = String::from("Hello")
+let s = "Hello".to_string()
+
+// Concatenation
+let hello = String::from("Hello, ")
+let world = String::from("world!")
+let greeting = hello + &world
+
+// Formatting
+let name = "Alice"
+let age = 30
+let intro = format("{} is {} years old", name, age)
+
+// String methods
+let s = "  Hello, World!  "
+s.trim()           // "Hello, World!"
+s.to_uppercase()   // "  HELLO, WORLD!  "
+s.to_lowercase()   // "  hello, world!  "
+s.contains("World") // true
+s.replace("World", "Nova")  // "  Hello, Nova!  "
+s.split(",")       // Iterator over ["  Hello", " World!  "]
+```
+
+### [ ] File I/O
+```nova
+use std::fs
+use std::io::{Read, Write}
+
+// Read entire file
+let contents = fs::read_to_string("file.txt")?
+
+// Write to file
+fs::write("output.txt", "Hello, World!")?
+
+// File handle
+let mut file = fs::File::open("file.txt")?
+let mut contents = String::new()
+file.read_to_string(&mut contents)?
+
+// Create and write
+let mut file = fs::File::create("output.txt")?
+file.write_all(b"Hello, World!")?
+
+// Directory operations
+fs::create_dir("new_dir")?
+fs::create_dir_all("path/to/nested/dir")?
+fs::remove_file("file.txt")?
+fs::remove_dir("empty_dir")?
+```
+
+### [ ] Command Line
+```nova
+use std::env
+
+// Command line arguments
+let args: Vec<String> = env::args().collect()
+let program_name = &args[0]
+let first_arg = args.get(1)
+
+// Environment variables
+let path = env::var("PATH")?
+env::set_var("MY_VAR", "value")
+
+// Current directory
+let cwd = env::current_dir()?
+env::set_current_dir("/new/path")?
+```
+
+### [ ] Time and Duration
+```nova
+use std::time::{Duration, Instant}
+
+// Measure elapsed time
+let start = Instant::now()
+// ... do work ...
+let elapsed = start.elapsed()
+println("Took {:?}", elapsed)
+
+// Create durations
+let five_seconds = Duration::from_secs(5)
+let half_second = Duration::from_millis(500)
+
+// Sleep
+thread::sleep(Duration::from_secs(1))
+```
+
+### [ ] Math Operations
+```nova
+// Integer operations
+let x: i32 = -5
+x.abs()           // 5
+x.pow(2)          // 25
+i32::MAX          // 2147483647
+i32::MIN          // -2147483648
+
+// Floating point operations
+let y: f64 = 3.14
+y.floor()         // 3.0
+y.ceil()          // 4.0
+y.round()         // 3.0
+y.sqrt()          // 1.772...
+y.sin()           // 0.00159...
+y.cos()           // -0.9999...
+f64::INFINITY     // Infinity
+f64::NAN          // NaN
+y.is_nan()        // false
+```
