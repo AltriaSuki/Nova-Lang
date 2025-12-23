@@ -1,5 +1,5 @@
 #include "nova/Basic/SourceLocation.hpp"
-#include<cassert>
+#include <cassert>
 #include <cstdint>
 
 namespace nova {

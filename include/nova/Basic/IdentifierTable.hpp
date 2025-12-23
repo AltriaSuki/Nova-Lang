@@ -5,7 +5,25 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
+
 namespace nova {
+
+// C++20 transparent hash for heterogeneous lookup
+struct StringHash {
+    using is_transparent = void;
+    
+    [[nodiscard]] std::size_t operator()(std::string_view sv) const noexcept {
+        return std::hash<std::string_view>{}(sv);
+    }
+};
+
+struct StringEqual {
+    using is_transparent = void;
+    
+    [[nodiscard]] bool operator()(std::string_view lhs, std::string_view rhs) const noexcept {
+        return lhs == rhs;
+    }
+};
 
 struct IdentifierInfo {
     std::string name;
@@ -18,19 +36,18 @@ struct IdentifierInfo {
 
 class IdentifierTable {
 private:
-    std::unordered_map<std::string_view, IdentifierInfo*> table_;
+    // Use std::string as key (owns the data), with transparent lookup
+    std::unordered_map<std::string, IdentifierInfo*, StringHash, StringEqual> table_;
     std::vector<std::unique_ptr<IdentifierInfo>> storage_;
 
 public:
     IdentifierTable();
 
-    IdentifierInfo* get(std::string_view name);
-    //string_view because somewhere exists a string in memory
+    [[nodiscard]] IdentifierInfo* get(std::string_view name);
     void add_identifier(const char* name);
 
 private:
     void add_keyword(const char* name, TokenKind kind);
-    
 };
 
 } // namespace nova

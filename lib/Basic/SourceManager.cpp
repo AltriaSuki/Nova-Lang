@@ -69,23 +69,18 @@ namespace nova {
         //find the largest line_offsets[i] <= offset
         //size_t is too large for comparison with uint32_t
         uint32_t left=0;
-        uint32_t right = static_cast<uint32_t>(file->line_offsets.size()-1);
-        int64_t pos = -1;
-        while(left <= right){
+        uint32_t right = static_cast<uint32_t>(file->line_offsets.size());
+        uint32_t pos = 0;
+        while(left < right){
             uint32_t mid = left + (right - left)/2;
             if(file->line_offsets[mid] <= offset){
                 pos = mid;
                 left = mid + 1;
             }else {
-                right = mid -1;
+                right = mid;
             }
         }
-        if(pos == -1){
-            line = 0;
-            column = 0;
-            return;
-        }
-        line = static_cast<uint32_t>(pos + 1); //line number is 1-based
+        line = pos + 1; //line number is 1-based
         column = offset - file->line_offsets[pos] + 1; //column number is 1-based
     }
 

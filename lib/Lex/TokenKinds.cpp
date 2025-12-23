@@ -71,6 +71,7 @@ namespace nova {
             case TokenKind::unknown: return "unknown";
             case TokenKind::count: return nullptr;
         }
+        return nullptr; // unreachable
     }
 
     const char* get_punctuation_spelling(TokenKind kind) {
@@ -106,6 +107,7 @@ namespace nova {
             case TokenKind::r_square: return "]";
             default: return nullptr;
         }
+        return nullptr; // unreachable
     }
 
 
