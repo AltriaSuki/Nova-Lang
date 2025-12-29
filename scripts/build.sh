@@ -1,10 +1,11 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 echo "Building Nova..."
 mkdir -p build
 cd build
-cmake ..
+BUILD_TYPE="${BUILD_TYPE:-Debug}"
+cmake -S .. -B . -DCMAKE_BUILD_TYPE="${BUILD_TYPE}"
 
 # Cross-platform CPU count detection
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -13,6 +14,7 @@ else
     NPROC=$(nproc)
 fi
 
-make -j"$NPROC"
+cmake --build . -j"$NPROC"
 echo "Build complete!"
-echo "Run: ./tools/nova/nova ../examples/hello_world.nova"
+echo "Run: ./bin/nova"
+echo "Run: ./bin/nova-repl"

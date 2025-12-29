@@ -1,8 +1,10 @@
 # Nova Language Features
 
-A comprehensive guide to Nova's language features.
+This document presents an aspirational catalogue of language features for Nova.
 
-> **Nova: The C++ you wish existed — modern, safe, no C legacy.**
+**Status:** Informative (non-normative). This document describes intended and proposed features; it is not an implementation report.
+
+Most sections use checkboxes (`[ ]`) to indicate planned or not-yet-implemented features, and some examples intentionally use provisional (“future”) syntax that may change as the compiler implementation evolves. For the smallest authoritative contract, prefer `docs/language-spec.md`.
 
 ## Design Philosophy
 
@@ -708,7 +710,7 @@ let excerpt = Excerpt { part: first_sentence }
 // Rule 1: Each reference parameter gets its own lifetime
 func first_word(s: &str) -> &str  // Compiler infers: func first_word<'a>(s: &'a str) -> &'a str
 
-// Rule 2: If there's exactly one input lifetime, it's assigned to all output lifetimes
+// Rule 2: If there is exactly one input lifetime, it is assigned to all output lifetimes
 func get_ref(s: &String) -> &str  // Output lifetime matches input
 
 // Rule 3: If one of the parameters is &self or &mut self, its lifetime is assigned to output
@@ -1015,7 +1017,7 @@ if let Option::Some(x) = some_value {
     println("no value")
 }
 
-// While let (loop until pattern doesn't match)
+// While let (loop until pattern does not match)
 let mut stack = vec![1, 2, 3]
 
 while let Option::Some(top) = stack.pop() {
@@ -1657,7 +1659,7 @@ clone2.borrow_mut().push(5)
 ```nova
 use std::rc::{Rc, Weak}
 
-// Weak - non-owning reference, doesn't prevent deallocation
+// Weak - non-owning reference, does not prevent deallocation
 struct Node {
     value: i32,
     parent: RefCell<Weak<Node>>,

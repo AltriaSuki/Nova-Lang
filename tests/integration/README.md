@@ -1,9 +1,9 @@
 # Integration Tests
 
-> TODO: Implement integration tests
+**Status:** Not yet implemented.
 
 ## Purpose
-Test interactions between multiple compiler components.
+This directory is reserved for tests that validate interactions between multiple compiler components.
 
 ## Test Categories
 - [ ] Lexer + Parser integration

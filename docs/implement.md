@@ -2,6 +2,10 @@
 
 Quick reference for implementation. See [implementation-plan.md](implementation-plan.md) for details.
 
+Notes:
+- This checklist tracks *implementation progress*, not solely file creation. Many files and targets already exist as scaffolding but may contain placeholder code.
+- Prefer implementing the smallest end-to-end vertical slice (e.g., `SourceManager → Lexer → token dump`) before expanding breadth.
+
 ---
 
 ## Table of Contents
@@ -73,9 +77,9 @@ Quick reference for implementation. See [implementation-plan.md](implementation-
 
 ## Phase 5: Interpreter (Week 13-16)
 
-- [ ] **Value** - `include/nova/CodeGen/Interpreter/Value.hpp`, `lib/CodeGen/Interpreter/Value.cpp` — Runtime values
-- [ ] **Environment** - `include/nova/CodeGen/Interpreter/Environment.hpp`, `lib/CodeGen/Interpreter/Environment.cpp` — Variable storage
-- [ ] **Interpreter** - `include/nova/CodeGen/Interpreter/Interpreter.hpp`, `lib/CodeGen/Interpreter/Interpreter.cpp` — Tree-walking interpreter
+- [ ] **Value** - `include/nova/Interpreter/Value.hpp`, `lib/Interpreter/Value.cpp` — Runtime values
+- [ ] **Environment** - `include/nova/Interpreter/Environment.hpp`, `lib/Interpreter/Environment.cpp` — Variable storage
+- [ ] **Interpreter** - `include/nova/Interpreter/Interpreter.hpp`, `lib/Interpreter/Interpreter.cpp` — Tree-walking interpreter
 - [ ] **Builtin** - `include/nova/Runtime/Builtin.hpp`, `lib/Runtime/Builtin.cpp` — Built-in functions
 
 ---
@@ -85,7 +89,7 @@ Quick reference for implementation. See [implementation-plan.md](implementation-
 - [ ] **StructDecl** - `include/nova/AST/Decl.hpp` (extend) — Struct definitions
 - [ ] **EnumDecl** - `include/nova/AST/Decl.hpp` (extend) — Enum definitions
 - [ ] **ImplDecl** - `include/nova/AST/Decl.hpp` (extend) — Impl blocks
-- [ ] **StructValue** - `lib/CodeGen/Interpreter/Value.cpp` (extend) — Runtime struct values
+- [ ] **StructValue** - `lib/Interpreter/Value.cpp` (extend) — Runtime struct values
 
 ---
 
@@ -122,7 +126,7 @@ Quick reference for implementation. See [implementation-plan.md](implementation-
 - [ ] **MatchExpr** - `include/nova/AST/Expr.hpp` (extend) — Match expression
 - [ ] **ParsePattern** - `lib/Parse/ParsePattern.cpp` — Pattern parsing
 - [ ] **SemaPattern** - `lib/Sema/SemaPattern.cpp` — Exhaustiveness check
-- [ ] **PatternMatcher** - `lib/CodeGen/Interpreter/PatternMatcher.cpp` — Runtime matching
+- [ ] **PatternMatcher** - `lib/Interpreter/PatternMatcher.cpp` — Runtime matching
 
 ---
 
@@ -131,7 +135,7 @@ Quick reference for implementation. See [implementation-plan.md](implementation-
 - [ ] **ClosureExpr** - `include/nova/AST/Expr.hpp` (extend) — Closure AST
 - [ ] **CaptureAnalysis** - `lib/Analysis/CaptureAnalysis.cpp` — Capture inference
 - [ ] **SemaClosure** - `lib/Sema/SemaClosure.cpp` — Closure type checking
-- [ ] **Closure** - `lib/CodeGen/Interpreter/Closure.cpp` — Runtime closure
+- [ ] **Closure** - `lib/Interpreter/Closure.cpp` — Runtime closure
 
 ---
 
@@ -207,7 +211,7 @@ Quick reference for implementation. See [implementation-plan.md](implementation-
 - [ ] **Attribute** - `include/nova/AST/Attribute.hpp` — Attribute AST
 - [ ] **ParseAttribute** - `lib/Parse/ParseAttribute.cpp` — Attribute parsing
 - [ ] **Derive** - `lib/CodeGen/Derive.cpp` — Auto derive traits
-- [ ] **ErrorFormat** - `lib/Basic/DiagnosticEngine.cpp` (extend) — Pretty errors
+- [ ] **ErrorFormat** - `lib/Basic/DiagnosticEngine.cpp` (extend) — Human-readable diagnostic rendering
 
 ---
 

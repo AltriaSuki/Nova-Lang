@@ -1,152 +1,45 @@
-# Nova Programming Language
+# Nova Programming Language (Nova-Lang)
 
-**The C++ you wish existed — modern, safe, no C legacy.**
+Nova is a learning-oriented compiler project for a future systems language that aims to combine a small, well-defined core with an optional LLVM backend.
 
-Nova is a systems programming language for developers who love C++'s power (classes, templates, RAII, operator overloading) but want to leave behind its C baggage (headers, preprocessor, null pointers, undefined behavior).
+## Status
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
-[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+This repository is under active development and is not yet a working Nova compiler. Most subsystems are scaffolding (headers, CMake targets, and placeholders) intended to support incremental implementation.
 
-## Why Nova?
+See `docs/status.md` for a summary of the current implementation status.
 
-### What You Keep from C++
-- ✅ **Classes with inheritance** - Real OOP, not just traits
-- ✅ **Templates/Generics** - Familiar `<T>` syntax
-- ✅ **RAII** - Deterministic resource management
-- ✅ **Operator overloading** - Natural syntax for custom types
-- ✅ **Value semantics** - Efficient, predictable memory layout
-- ✅ **Zero-cost abstractions** - No runtime overhead
+**Implemented (usable today):**
+- `nova::SourceLocation` / `nova::SourceRange` and basic source file management in `nova::SourceManager`.
+- Token kind definitions (`TokenKind`) and token spelling helpers.
 
-### What You Leave Behind (C Legacy)
-- ❌ **No headers** - Single-file modules with `use` imports
-- ❌ **No preprocessor** - No `#include`, `#define`, `#ifdef` hell
-- ❌ **No null pointers** - `Option<T>` instead
-- ❌ **No undefined behavior** - Everything is defined
-- ❌ **No manual memory management** - Ownership system handles it
-- ❌ **No implicit conversions** - Explicit is better
-- ❌ **No `void*`** - Use generics `<T>` instead
+**Scaffolded (APIs exist, implementation incomplete):**
+- Diagnostics (`DiagnosticEngine`), lexer (`Lexer`), parser/AST, semantic analysis, IR, interpreter, and LLVM code generation.
 
-## Features
-
-- **Memory Safety** - Ownership system with borrowing (no garbage collector)
-- **Zero-Cost Abstractions** - High-level features compile to efficient machine code
-- **Type System** - Strong + Static + Inference
-- **RAII** - Scope-based drop, deterministic destruction
-- **Functional-First** - Immutable by default, expressions everywhere, pattern matching
-- **Error Handling** - `Result<T, E>` and `Option<T>` for explicit error handling
-- **Modern OOP** - Classes and traits when you need them
-
-## Quick Start
+## Getting Started
 
 ### Prerequisites
 
 - CMake 3.15+
 - C++20 compatible compiler (GCC 10+, Clang 12+, MSVC 2019+)
-- Git
 
 ### Build
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/Nova-Lang.git
-cd Nova-Lang
-
-# Build the project
 ./scripts/build.sh
-
-# Run tests
-./scripts/test.sh
 ```
 
-### Usage
+Outputs are placed in `build/bin/`.
+
+### Run
 
 ```bash
-# Compile a Nova file
-./build/bin/nova examples/hello_world.nova
-
-# Start the REPL
+./build/bin/nova
 ./build/bin/nova-repl
 ```
 
-## Hello World
+## Language Design (Draft)
 
-```nova
-func main() {
-    println("Hello, World!")
-}
-```
-
-## Example: Classes (No Headers!)
-
-```nova
-// No #include, no forward declarations, no header files
-class Animal {
-    priv name: String
-    
-    pub func new(name: String) -> Self {
-        Self { name }
-    }
-    
-    pub func speak(&self) {
-        println("{} makes a sound", self.name)
-    }
-}
-
-class Dog : Animal {
-    pub func speak(&self) {
-        println("{} barks!", self.name)
-    }
-}
-
-func main() {
-    let dog = Dog::new("Buddy")
-    dog.speak()  // "Buddy barks!"
-}
-```
-
-## Example: No Null, Use Option
-
-```nova
-func find_user(id: i32) -> Option<User> {
-    if id == 1 {
-        Option::Some(User::new("Alice"))
-    } else {
-        Option::None
-    }
-}
-
-func main() {
-    // No null pointer exceptions - compiler enforces handling
-    match find_user(1) {
-        Some(user) => println("Found: {}", user.name),
-        None => println("User not found")
-    }
-}
-```
-
-## Example: RAII (Automatic Cleanup)
-
-```nova
-class File {
-    priv handle: FileHandle
-    
-    pub func open(path: str) -> Result<Self, IoError> {
-        // ...
-    }
-}
-
-impl Drop for File {
-    func drop(&mut self) {
-        // Automatically called when File goes out of scope
-        self.handle.close()
-    }
-}
-
-func main() {
-    let file = File::open("data.txt")?
-    // Use file...
-}   // file.drop() called automatically here - no leaks!
-```
+The `.nova` examples in this repo illustrate the *intended* surface syntax. The authoritative draft spec lives in `docs/language-spec.md`, and the aspirational feature catalog is in `docs/features.md`.
 
 ## Project Structure
 
@@ -197,34 +90,16 @@ Nova-Lang/
 
 ## Documentation
 
-- [Language Features](docs/features.md) - Complete language reference
-- [Implementation Guide](docs/implement.md) - Compiler implementation details
-- [Implementation Plan](docs/implementation-plan.md) - Development roadmap
-- [CMake Guide](docs/cmake-guide.md) - Build system documentation
-
-## Comparison
-
-| Feature | C++ | Nova |
-|---------|-----|------|
-| Headers | `.h`/`.hpp` files | None - single file modules |
-| Null | `nullptr`, raw pointers | `Option<T>` |
-| Memory | `new`/`delete`, smart pointers | Ownership (automatic) |
-| Strings | `char*`, `std::string` | `String`, `str` |
-| Errors | Exceptions, error codes | `Result<T, E>` |
-| Preprocessor | `#include`, `#define` | None |
-| Inheritance | `class Derived : public Base` | `class Derived : Base` |
-| Generics | `template<typename T>` | `<T>` |
-| UB | Everywhere | None - everything defined |
+- `docs/README.md` — documentation index and where to start
+- `docs/language-spec.md` — draft language spec (small, testable core)
+- `docs/architecture.md` — compiler architecture (modules and data flow)
+- `docs/developer-guide.md` — build, tests, workflow
+- `docs/implementation-plan.md` / `docs/implement.md` — roadmap and task lists
+- `docs/cmake-guide.md` — build system notes (LLVM + tests)
 
 ## Contributing
 
-Contributions are welcome! Please read the documentation in `docs/` before contributing.
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Contributions are welcome. Start from `docs/developer-guide.md` and pick a small, isolated task from `docs/implement.md`.
 
 ## License
 

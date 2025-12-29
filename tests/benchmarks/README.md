@@ -1,9 +1,9 @@
 # Benchmarks
 
-> TODO: Implement performance benchmarks
+**Status:** Not yet implemented.
 
 ## Purpose
-Measure and track compiler performance.
+This directory is reserved for benchmarks that measure compiler performance.
 
 ## Benchmark Categories
 - [ ] Lexer throughput
@@ -19,4 +19,4 @@ cd build
 ```
 
 ## Tracking
-TODO: Set up benchmark tracking with historical data
+Benchmark tracking infrastructure is not yet provided.

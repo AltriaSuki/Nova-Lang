@@ -1,6 +1,8 @@
 # CMake Guide for Nova-Lang
 
-A comprehensive guide to understanding and maintaining the CMake build system for the Nova compiler.
+This document provides a detailed description of the CMake build system for the Nova compiler, including recommended maintenance practices.
+
+Remark: The root `project()` enables both `C` and `CXX` because certain LLVM CMake configuration checks compile small C test files during configuration.
 
 ---
 
@@ -32,8 +34,8 @@ Nova-Lang/
 │   ├── Sema/CMakeLists.txt     # novaSema library
 │   ├── CodeGen/
 │   │   ├── CMakeLists.txt      # novaCodeGen library
-│   │   └── Interpreter/
-│   │       └── CMakeLists.txt  # novaInterpreter library
+│   │   └── LLVM/CMakeLists.txt # optional LLVM backend (if LLVM is found)
+│   ├── Interpreter/CMakeLists.txt # novaInterpreter library
 │   ├── Driver/CMakeLists.txt   # novaDriver library
 │   ├── IR/CMakeLists.txt       # novaIR library
 │   ├── Transforms/CMakeLists.txt # novaTransforms library
@@ -72,44 +74,23 @@ novaBasic (foundation - no dependencies)
 
 ---
 
-## Current Issues Found
+## Current Issues
 
-### ❌ Issue 1: Interpreter Subdirectory Not Included
+### Issue 1: Tests May Require Network Access
 
-**Location:** `lib/CodeGen/CMakeLists.txt`
+**Location:** `tests/CMakeLists.txt`
 
-**Problem:** The `Interpreter/` subdirectory is not added via `add_subdirectory()`, so `novaInterpreter` is never built.
+**Problem:** If `GTest` is not installed, CMake uses `FetchContent` to download GoogleTest. In restricted/offline environments this may fail.
 
-**Fix:**
-```cmake
-# lib/CodeGen/CMakeLists.txt
-add_library(novaCodeGen
-    CodeGenModule.cpp
-)
+**Mitigations:**
+- Install GoogleTest via the system package manager, or
+- Configure with `-DNOVA_BUILD_TESTS=OFF` to skip tests.
 
-target_link_libraries(novaCodeGen PUBLIC
-    novaBasic
-    novaAST
-)
-
-target_include_directories(novaCodeGen PUBLIC
-    ${PROJECT_SOURCE_DIR}/include
-)
-
-# ADD THIS LINE:
-add_subdirectory(Interpreter)
-```
-
-### ⚠️ Issue 2: Missing Libraries in Tool Linking
+### Issue 2: Tool Linking Is Intentionally Minimal
 
 **Location:** `tools/nova/CMakeLists.txt`
 
-**Problem:** The `nova` executable doesn't link against some libraries it may need:
-- `novaInterpreter` - for running interpreted code
-- `novaIR` - for IR generation
-- `novaTransforms` - for optimizations
-- `novaAnalysis` - for borrow checking
-- `novaRuntime` - for built-in functions
+**Context:** As the compiler grows, the `nova` tool may need to link additional subsystem libraries (IR/Transforms/Analysis/Runtime/Interpreter).
 
 **Current:**
 ```cmake
@@ -124,37 +105,23 @@ target_link_libraries(nova PRIVATE
 )
 ```
 
-**Suggested Fix:**
-```cmake
-target_link_libraries(nova PRIVATE
-    novaDriver
-    novaCodeGen
-    novaInterpreter  # ADD
-    novaSema
-    novaParse
-    novaLex
-    novaAST
-    novaBasic
-    novaIR           # ADD
-    novaTransforms   # ADD
-    novaAnalysis     # ADD
-    novaRuntime      # ADD
-)
-```
+**Guidance:** Add libraries to this list only when the tool begins calling into them, in order to preserve a tractable link-dependency structure.
 
-### ⚠️ Issue 3: Redundant Include Directories
+### Issue 3: Redundant Include Directories
 
-**Problem:** Every library sets `target_include_directories()` to the same path. This is redundant because the root `CMakeLists.txt` already has `include_directories(${PROJECT_SOURCE_DIR}/include)`.
+**Problem:** Many targets set `target_include_directories(... ${PROJECT_SOURCE_DIR}/include)` repeatedly.
+
+In the current tree, the build already follows a target-based approach (the root does not use global `include_directories()`), so this is not a correctness issue. It’s mostly a maintainability question.
 
 **Options:**
-1. Remove `target_include_directories()` from all library CMakeLists (simpler)
-2. Remove global `include_directories()` and keep per-target (more explicit, modern CMake)
+1. Retain the current per-target declarations (explicit and local to each target).
+2. Centralize common include paths via an `INTERFACE` target and link it into all relevant targets (reduces repetition).
 
-**Recommended:** Option 2 (modern CMake approach) - already being done, just remove the global one from root.
+**Recommended:** Option 2 if repetition becomes a maintenance burden; otherwise the current explicit approach is sufficient.
 
-### ⚠️ Issue 4: Missing Output Directory Configuration
+### Issue 4: Output Directory Configuration
 
-**Problem:** Executables go to `build/tools/nova/` instead of a unified `build/bin/`.
+**Observation:** Output directories are configured in the root `CMakeLists.txt` so executables are placed under `build/bin/` and libraries under `build/lib/`.
 
 **Fix in root CMakeLists.txt:**
 ```cmake
@@ -164,16 +131,16 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 ```
 
-### ✅ Good Practices Already in Use
+### Good Practices Already in Use
 
-1. ✅ CMake 3.15 minimum version
-2. ✅ C++20 standard enforced
-3. ✅ Compile commands exported (`CMAKE_EXPORT_COMPILE_COMMANDS`)
-4. ✅ Platform-specific compiler warnings
-5. ✅ Option for building tests
-6. ✅ FetchContent for GoogleTest
-7. ✅ `target_link_libraries` with PUBLIC/PRIVATE visibility
-8. ✅ Proper install target for nova executable
+1. CMake 3.15 minimum version
+2. C++20 standard enforced
+3. Compile commands exported (`CMAKE_EXPORT_COMPILE_COMMANDS`)
+4. Platform-specific compiler warnings
+5. Option for building tests
+6. FetchContent for GoogleTest
+7. `target_link_libraries` with PUBLIC/PRIVATE visibility
+8. Install target for the `nova` executable
 
 ---
 
@@ -211,13 +178,13 @@ endif()
 
 ### 2. Modern Target-Based Approach
 
-**❌ Old style (avoid):**
+**Legacy style (avoid):**
 ```cmake
 include_directories(${PROJECT_SOURCE_DIR}/include)
 link_libraries(somelib)
 ```
 
-**✅ Modern style (use):**
+**Target-based style (recommended):**
 ```cmake
 target_include_directories(mylib PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -364,7 +331,7 @@ gtest_discover_tests(unit_tests)
 ```cmake
 # Root CMakeLists.txt
 cmake_minimum_required(VERSION 3.15)
-project(Nova VERSION 0.1.0 LANGUAGES CXX)
+project(Nova VERSION 0.1.0 LANGUAGES C CXX)
 
 # Standards
 set(CMAKE_CXX_STANDARD 20)
@@ -386,7 +353,7 @@ target_compile_options(nova_compiler_flags INTERFACE
 
 # Options
 option(NOVA_BUILD_TESTS "Build tests" ON)
-option(NOVA_ENABLE_LLVM "Enable LLVM backend" OFF)
+option(NOVA_ENABLE_LLVM "Enable LLVM backend (if available)" ON)
 
 # Subdirectories
 add_subdirectory(lib)
@@ -483,24 +450,18 @@ add_executable(novaTests
 ### Conditional Compilation
 
 ```cmake
-# Optional LLVM support
-option(NOVA_ENABLE_LLVM "Enable LLVM backend" OFF)
-
+# Optional LLVM support (Nova-Lang pattern)
+#
+# - Root defines: option(NOVA_ENABLE_LLVM "Enable LLVM backend (if available)" ON)
+# - LLVM backend is built only when enabled *and* LLVM is found.
 if(NOVA_ENABLE_LLVM)
-    find_package(LLVM REQUIRED CONFIG)
-    
-    target_sources(novaCodeGen PRIVATE
-        LLVMCodeGen.cpp
-    )
-    
-    target_link_libraries(novaCodeGen PRIVATE
-        LLVM::Core
-        LLVM::Support
-    )
-    
-    target_compile_definitions(novaCodeGen PUBLIC
-        NOVA_ENABLE_LLVM=1
-    )
+    find_package(LLVM CONFIG)
+endif()
+
+if(NOVA_ENABLE_LLVM AND LLVM_FOUND)
+    add_library(novaLLVMCodeGen ...)
+    target_link_libraries(novaLLVMCodeGen PUBLIC ... ${llvm_libs})
+    target_compile_definitions(novaLLVMCodeGen PUBLIC NOVA_HAS_LLVM_BACKEND)
 endif()
 ```
 
@@ -580,12 +541,10 @@ cmake --install build --prefix /usr/local
 
 ---
 
-## Summary of Fixes Needed
+## Summary Checklist
 
-1. **Critical:** Add `add_subdirectory(Interpreter)` to `lib/CodeGen/CMakeLists.txt`
-2. **Recommended:** Add missing libraries to `tools/nova/CMakeLists.txt` linking
-3. **Recommended:** Add output directory configuration to root CMakeLists.txt
-4. **Optional:** Remove global `include_directories()` (already covered by per-target)
-5. **Optional:** Add library aliases (e.g., `Nova::Basic`)
-
-Apply these fixes to ensure all components build correctly!
+- Maintain a single required language standard (currently C++20) and prefer `CMAKE_CXX_EXTENSIONS OFF`.
+- Prefer `cmake --build` over calling `make` directly in scripts (generator-agnostic).
+- Maintain output-directory configuration in the root so binaries are placed in `build/bin` and libraries in `build/lib`.
+- Maintain optional tests (`-DNOVA_BUILD_TESTS=OFF`) to support restricted or offline environments.
+- Maintain an optional LLVM backend (`-DNOVA_ENABLE_LLVM=OFF` to force-disable; otherwise build only when LLVM is found) and gate code with `NOVA_HAS_LLVM_BACKEND`.

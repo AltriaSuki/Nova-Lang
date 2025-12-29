@@ -1,9 +1,9 @@
 # End-to-End Tests
 
-> TODO: Implement end-to-end tests
+**Status:** Not yet implemented.
 
 ## Purpose
-Test complete compilation and execution of Nova programs.
+This directory is reserved for tests that validate end-to-end compilation and execution of Nova programs.
 
 ## Test Categories
 - [ ] Compile and run tests

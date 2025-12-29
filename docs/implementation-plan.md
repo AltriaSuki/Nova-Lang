@@ -36,7 +36,7 @@ Tokenize Nova source code into a stream of tokens.
 
 ### Files to Implement
 
-#### Already Done ✅
+#### Already Implemented
 - `include/nova/Basic/SourceLocation.hpp`
 - `include/nova/Basic/SourceManager.hpp`
 - `include/nova/Basic/IdentifierTable.hpp`
@@ -260,21 +260,21 @@ Execute Nova programs via tree-walking interpretation.
 
 ### Files to Create
 
-#### Interpreter (`include/nova/CodeGen/Interpreter/`, `lib/CodeGen/Interpreter/`)
+#### Interpreter (`include/nova/Interpreter/`, `lib/Interpreter/`)
 
 | File | Tasks |
 |------|-------|
-| `include/nova/CodeGen/Interpreter/Value.hpp` | [ ] Value variant (i32, i64, f32, f64, bool, string, etc.) |
-| `include/nova/CodeGen/Interpreter/Environment.hpp` | [ ] Runtime environment (variable storage) |
-| `include/nova/CodeGen/Interpreter/Interpreter.hpp` | [ ] Interpreter class |
-| `lib/CodeGen/Interpreter/Value.cpp` | [ ] Value operations, type conversions |
-| `lib/CodeGen/Interpreter/Environment.cpp` | [ ] Variable get/set, scope management |
-| `lib/CodeGen/Interpreter/Interpreter.cpp` | [ ] Main interpreter loop |
-| `lib/CodeGen/Interpreter/ExprEvaluator.cpp` | [ ] eval_binary_expr() |
+| `include/nova/Interpreter/Value.hpp` | [ ] Value variant (i32, i64, f32, f64, bool, string, etc.) |
+| `include/nova/Interpreter/Environment.hpp` | [ ] Runtime environment (variable storage) |
+| `include/nova/Interpreter/Interpreter.hpp` | [ ] Interpreter class |
+| `lib/Interpreter/Value.cpp` | [ ] Value operations, type conversions |
+| `lib/Interpreter/Environment.cpp` | [ ] Variable get/set, scope management |
+| `lib/Interpreter/Interpreter.cpp` | [ ] Main interpreter loop |
+| `lib/Interpreter/ExprEvaluator.cpp` | [ ] eval_binary_expr() |
 | | [ ] eval_unary_expr() |
 | | [ ] eval_call_expr() |
 | | [ ] eval_literal() |
-| `lib/CodeGen/Interpreter/StmtExecutor.cpp` | [ ] exec_if_stmt() |
+| `lib/Interpreter/StmtExecutor.cpp` | [ ] exec_if_stmt() |
 | | [ ] exec_while_stmt() |
 | | [ ] exec_for_stmt() |
 | | [ ] exec_return_stmt() |
@@ -327,7 +327,7 @@ User-defined types with methods.
 | | [ ] check_impl_block() |
 | `include/nova/AST/Expr.hpp` | [ ] StructInitExpr |
 | | [ ] EnumVariantExpr |
-| `lib/CodeGen/Interpreter/Value.hpp` | [ ] StructValue |
+| `lib/Interpreter/Value.hpp` | [ ] StructValue |
 | | [ ] EnumValue |
 
 ### Milestone
@@ -404,7 +404,7 @@ func main() {
 
 ---
 
-## Phase 7: Ownership & Borrowing (Weeks 51-66) ⚠️ HARDEST
+## Phase 7: Ownership & Borrowing (Weeks 51-66) (High Complexity)
 
 ### Goal
 Implement Rust-like ownership and borrow checking.
@@ -441,7 +441,7 @@ Implement Rust-like ownership and borrow checking.
    - No use after move
    - No mutable borrow while immutable borrows exist
    - No multiple mutable borrows
-   - Borrows don't outlive data
+   - Borrows do not outlive data
 4. Report errors with helpful messages
 ```
 
@@ -581,7 +581,7 @@ Full pattern matching with match expressions.
 | `lib/Sema/SemaPattern.cpp` | [ ] Exhaustiveness checking |
 | | [ ] Pattern type checking |
 | | [ ] Guard expression checking |
-| `lib/CodeGen/Interpreter/PatternMatcher.cpp` | [ ] Pattern matching runtime |
+| `lib/Interpreter/PatternMatcher.cpp` | [ ] Pattern matching runtime |
 
 ### Milestone
 ```nova
@@ -623,7 +623,7 @@ First-class functions and closures with capture.
 | | [ ] Check closure types |
 | `lib/Analysis/CaptureAnalysis.cpp` | [ ] Determine what to capture |
 | | [ ] Integrate with borrow checker |
-| `lib/CodeGen/Interpreter/Closure.cpp` | [ ] Closure runtime representation |
+| `lib/Interpreter/Closure.cpp` | [ ] Closure runtime representation |
 
 ### Closure Traits
 ```
@@ -948,7 +948,7 @@ User-friendly compiler experience.
 | | [ ] Source code snippets |
 | | [ ] Underline error location |
 | | [ ] Suggestion hints |
-| | [ ] "Did you mean X?" suggestions |
+| | [ ] Name-suggestion diagnostics |
 | Warnings | [ ] Unused variables |
 | | [ ] Unused imports |
 | | [ ] Unreachable code |

@@ -1,9 +1,17 @@
 # LLVM Backend (optional, requires LLVM)
 
-# Find LLVM package
-find_package(LLVM CONFIG)
+if(NOT DEFINED NOVA_ENABLE_LLVM)
+    set(NOVA_ENABLE_LLVM ON)
+endif()
 
-if(LLVM_FOUND)
+if(NOVA_ENABLE_LLVM)
+    # Find LLVM package
+    find_package(LLVM CONFIG)
+else()
+    message(STATUS "LLVM backend disabled (NOVA_ENABLE_LLVM=OFF)")
+endif()
+
+if(NOVA_ENABLE_LLVM AND LLVM_FOUND)
     message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
     message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
@@ -41,7 +49,7 @@ if(LLVM_FOUND)
 
     # Export that LLVM backend is available
     target_compile_definitions(novaLLVMCodeGen PUBLIC NOVA_HAS_LLVM_BACKEND)
-else()
+elseif(NOVA_ENABLE_LLVM)
     message(STATUS "LLVM not found - LLVM backend will not be built")
     message(STATUS "To enable LLVM backend, install LLVM and set LLVM_DIR")
 endif()
