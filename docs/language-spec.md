@@ -21,7 +21,7 @@ This document defines the **intended “Nova Core”**: a small, precise subset 
 
 ### 1.1 Source Text
 
-- Source files are UTF-8 text.
+- Source files are UTF-8 text and must be valid UTF-8 (no ill-formed byte sequences).
 - Newlines may be `\n` or `\r\n`. Tools should normalize to `\n` for diagnostics.
 
 ### 1.2 Whitespace
@@ -72,7 +72,7 @@ Nova Core identifiers are ASCII-only:
 - Start: `A-Z` / `a-z` / `_`
 - Continue: `A-Z` / `a-z` / `0-9` / `_`
 
-Unicode identifiers are currently unspecified.
+Unicode identifiers are not supported in Nova Core.
 
 ### 1.6 Tokens: Operators and Punctuation
 
@@ -131,6 +131,8 @@ Exp := ("e" | "E") ("+" | "-")? Digit+
 
 String literals use double quotes: `"..."`.
 
+The source text of a string literal may contain any Unicode characters encoded as UTF-8 bytes (in addition to escapes). Ill-formed UTF-8 is a lexing error.
+
 Escape sequences (core set):
 - `\\` backslash
 - `\"` quote
@@ -139,7 +141,11 @@ Escape sequences (core set):
 - `\t` tab
 - `\0` NUL
 
-Unicode escapes are currently unspecified.
+Unicode escape sequence:
+- `\u{HEX}` where `HEX` is 1 to 6 hex digits (`0-9a-fA-F`), denoting a Unicode scalar value.
+  - Values in the surrogate range (`U+D800..U+DFFF`) are invalid.
+  - Values greater than `U+10FFFF` are invalid.
+  - In a string literal, the scalar value is appended to the literal value encoded as UTF-8.
 
 Multiline string literals are currently unspecified.
 
@@ -149,7 +155,9 @@ Character literals use single quotes: `'a'`.
 
 The same escape set as string literals is supported.
 
-The exact type and encoding of `char` are currently unspecified.
+A character literal denotes exactly one Unicode scalar value (either directly from the UTF-8 source text or via an escape sequence). If the literal denotes zero or more than one scalar value, it is a lexing error.
+
+When the `char` type is supported, it represents a Unicode scalar value.
 
 #### 1.7.5 Boolean literals
 

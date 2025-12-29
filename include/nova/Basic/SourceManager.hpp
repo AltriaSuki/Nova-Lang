@@ -10,6 +10,7 @@ namespace nova {
 struct FileEntry {
     std::string filename;
     std::string content;
+    // every line's starting offset in content
     std::vector<uint32_t> line_offsets;
     uint16_t file_id;
 
@@ -25,6 +26,7 @@ private:
 
 public:
     SourceManager() = default;
+    ~SourceManager() = default;
 
     uint16_t add_file(std::string filename, std::string content);
     const FileEntry* get_file(uint16_t file_id) const;
@@ -35,6 +37,7 @@ public:
     void get_line_column(SourceLocation loc, uint32_t& line, uint32_t& column) const;
     std::string_view get_filename(SourceLocation loc) const;
     std::string format_location(SourceLocation loc) const;
+
 };
 
 } // namespace nova

@@ -1,6 +1,7 @@
 #pragma once
 #include "Diagnostic.hpp"
 #include "SourceLocation.hpp"
+#include "SourceManager.hpp"
 #include <string>
 #include <string_view>
 #include <vector>
@@ -9,7 +10,6 @@
 
 namespace nova {
 
-class SourceManager;
 
 /// A single diagnostic message with location and arguments
 struct DiagnosticMessage {
@@ -23,6 +23,7 @@ struct DiagnosticMessage {
 /// Builder for constructing diagnostics with arguments
 class DiagnosticBuilder {
 private:
+    //use* to avoid circular dependency
     class DiagnosticEngine* engine_;
     DiagnosticMessage diag_;
     bool emitted_ = false;
@@ -34,6 +35,7 @@ public:
     // Move-only
     DiagnosticBuilder(DiagnosticBuilder&& other) noexcept;
     DiagnosticBuilder& operator=(DiagnosticBuilder&& other) noexcept;
+    // unable to copy
     DiagnosticBuilder(const DiagnosticBuilder&) = delete;
     DiagnosticBuilder& operator=(const DiagnosticBuilder&) = delete;
     
@@ -55,6 +57,7 @@ public:
 /// Central diagnostic reporting engine
 class DiagnosticEngine {
 public:
+    // Handler function type for diagnostics
     using DiagnosticHandler = std::function<void(const DiagnosticMessage&)>;
 
 private:

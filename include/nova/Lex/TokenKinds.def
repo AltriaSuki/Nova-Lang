@@ -1,0 +1,97 @@
+//===----------------------------------------------------------------------===//
+// TokenKind definitions (X-macro list)
+//
+// This file is included multiple times with one or more of the following
+// macros defined:
+//   NOVA_KEYWORD(name, spelling)
+//   NOVA_TYPE_KEYWORD(name, spelling)
+//   NOVA_PUNCT(name, spelling)
+//   NOVA_LITERAL(name, token_name)
+//   NOVA_TOKEN(name, token_name)
+//
+// The goal is a single source of truth for:
+// - the TokenKind enum values
+// - human-readable token names
+// - punctuation spellings
+// - keyword tables
+//===----------------------------------------------------------------------===//
+
+// Keywords
+NOVA_KEYWORD(kw_func, "func")
+NOVA_KEYWORD(kw_let, "let")
+NOVA_KEYWORD(kw_mut, "mut")
+NOVA_KEYWORD(kw_class, "class")
+NOVA_KEYWORD(kw_trait, "trait")
+NOVA_KEYWORD(kw_impl, "impl")
+NOVA_KEYWORD(kw_if, "if")
+NOVA_KEYWORD(kw_else, "else")
+NOVA_KEYWORD(kw_match, "match")
+NOVA_KEYWORD(kw_while, "while")
+NOVA_KEYWORD(kw_for, "for")
+NOVA_KEYWORD(kw_return, "return")
+NOVA_KEYWORD(kw_pub, "pub")
+NOVA_KEYWORD(kw_priv, "priv")
+NOVA_KEYWORD(kw_mod, "mod")
+NOVA_KEYWORD(kw_use, "use")
+NOVA_KEYWORD(kw_unsafe, "unsafe")
+NOVA_KEYWORD(kw_true, "true")
+NOVA_KEYWORD(kw_false, "false")
+
+// Type keywords
+NOVA_TYPE_KEYWORD(kw_i8, "i8")
+NOVA_TYPE_KEYWORD(kw_i16, "i16")
+NOVA_TYPE_KEYWORD(kw_i32, "i32")
+NOVA_TYPE_KEYWORD(kw_i64, "i64")
+NOVA_TYPE_KEYWORD(kw_u8, "u8")
+NOVA_TYPE_KEYWORD(kw_u16, "u16")
+NOVA_TYPE_KEYWORD(kw_u32, "u32")
+NOVA_TYPE_KEYWORD(kw_u64, "u64")
+NOVA_TYPE_KEYWORD(kw_f32, "f32")
+NOVA_TYPE_KEYWORD(kw_f64, "f64")
+NOVA_TYPE_KEYWORD(kw_bool, "bool")
+NOVA_TYPE_KEYWORD(kw_str, "str")
+NOVA_TYPE_KEYWORD(kw_char, "char")
+
+// Punctuation (spelling)
+NOVA_PUNCT(plus, "+")
+NOVA_PUNCT(minus, "-")
+NOVA_PUNCT(star, "*")
+NOVA_PUNCT(slash, "/")
+NOVA_PUNCT(percent, "%")
+NOVA_PUNCT(equal, "=")
+NOVA_PUNCT(equalequal, "==")
+NOVA_PUNCT(exclaimequal, "!=")
+NOVA_PUNCT(less, "<")
+NOVA_PUNCT(lessequal, "<=")
+NOVA_PUNCT(greater, ">")
+NOVA_PUNCT(greaterequal, ">=")
+NOVA_PUNCT(amp, "&")
+NOVA_PUNCT(ampamp, "&&")
+NOVA_PUNCT(pipe, "|")
+NOVA_PUNCT(pipepipe, "||")
+NOVA_PUNCT(arrow, "->")
+NOVA_PUNCT(fatarrow, "=>")
+NOVA_PUNCT(period, ".")
+NOVA_PUNCT(coloncolon, "::")
+NOVA_PUNCT(comma, ",")
+NOVA_PUNCT(semi, ";")
+NOVA_PUNCT(colon, ":")
+NOVA_PUNCT(l_paren, "(")
+NOVA_PUNCT(r_paren, ")")
+NOVA_PUNCT(l_brace, "{")
+NOVA_PUNCT(r_brace, "}")
+NOVA_PUNCT(l_square, "[")
+NOVA_PUNCT(r_square, "]")
+
+// Literals
+NOVA_LITERAL(numeric_constant, "numeric constant")
+NOVA_LITERAL(string_literal, "string literal")
+NOVA_LITERAL(char_constant, "char constant")
+NOVA_LITERAL(floating_constant, "floating constant")
+
+// Identifiers
+NOVA_TOKEN(identifier, "identifier")
+
+// Special
+NOVA_TOKEN(eof, "end of file")
+NOVA_TOKEN(unknown, "unknown")

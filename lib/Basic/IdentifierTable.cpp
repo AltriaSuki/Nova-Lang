@@ -10,17 +10,24 @@ namespace nova {
     }
 
     IdentifierTable::IdentifierTable() {
-        for (std::size_t i = 0; i < static_cast<std::size_t>(TokenKind::count); ++i) {
-            TokenKind kind = static_cast<TokenKind>(i);
-            const char* name = get_token_name(kind);
-            if (name) {
-                add_keyword(name, kind);
-            }
-        }
-    }
+        // Seed the table with reserved keywords/type-keywords.
+#define NOVA_KEYWORD(name, spelling) add_keyword(spelling, TokenKind::name);
+#define NOVA_TYPE_KEYWORD(name, spelling) add_keyword(spelling, TokenKind::name);
+#define NOVA_PUNCT(name, spelling)
+#define NOVA_LITERAL(name, token_name)
+#define NOVA_TOKEN(name, token_name)
+#include "nova/Lex/TokenKinds.def"
+#undef NOVA_TOKEN
+#undef NOVA_LITERAL
+#undef NOVA_PUNCT
+#undef NOVA_TYPE_KEYWORD
+#undef NOVA_KEYWORD
+	    }
 
     void IdentifierTable::add_identifier(const char* name) {
-        add_keyword(name, TokenKind::identifier);
+        auto info = std::make_unique<IdentifierInfo>(name, TokenKind::identifier, false);
+        table_.emplace(info->name, info.get());
+        storage_.push_back(std::move(info));
     }
     //
     IdentifierInfo* IdentifierTable::get(std::string_view name) {

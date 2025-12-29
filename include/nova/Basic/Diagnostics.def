@@ -1,0 +1,79 @@
+//===----------------------------------------------------------------------===//
+// Diagnostic definitions (X-macro list)
+//
+// This file is included multiple times with NOVA_DIAGNOSTIC defined as:
+//   NOVA_DIAGNOSTIC(name, default_severity, code, format_string)
+//
+// Keep all diagnostics in this single list to avoid duplicated switch tables.
+//===----------------------------------------------------------------------===//
+
+// Lexer errors (1xx)
+NOVA_DIAGNOSTIC(err_invalid_character, Error, "E0101", "invalid character")
+NOVA_DIAGNOSTIC(err_unterminated_string, Error, "E0102", "unterminated string literal")
+NOVA_DIAGNOSTIC(err_unterminated_char, Error, "E0103", "unterminated character literal")
+NOVA_DIAGNOSTIC(err_invalid_escape_sequence, Error, "E0104", "invalid escape sequence")
+NOVA_DIAGNOSTIC(err_empty_char_literal, Error, "E0105", "empty character literal")
+NOVA_DIAGNOSTIC(err_invalid_number_literal, Error, "E0106", "invalid number literal")
+
+// Parser errors (2xx)
+NOVA_DIAGNOSTIC(err_expected_token, Error, "E0007", "expected token")
+NOVA_DIAGNOSTIC(err_expected_expression, Error, "E0201", "expected expression")
+NOVA_DIAGNOSTIC(err_expected_type, Error, "E0202", "expected type")
+NOVA_DIAGNOSTIC(err_expected_identifier, Error, "E0203", "expected identifier")
+NOVA_DIAGNOSTIC(err_expected_semicolon, Error, "E0007", "expected ';'")
+NOVA_DIAGNOSTIC(err_expected_closing_paren, Error, "E0007", "expected ')'")
+NOVA_DIAGNOSTIC(err_expected_closing_brace, Error, "E0007", "expected '}'")
+NOVA_DIAGNOSTIC(err_expected_closing_bracket, Error, "E0007", "expected ']'")
+NOVA_DIAGNOSTIC(err_unexpected_token, Error, "E0008", "unexpected token")
+NOVA_DIAGNOSTIC(err_invalid_declaration, Error, "E0204", "invalid declaration")
+
+// Type errors (3xx)
+NOVA_DIAGNOSTIC(err_type_mismatch, Error, "E0002", "type mismatch")
+NOVA_DIAGNOSTIC(err_unknown_type, Error, "E0301", "unknown type")
+NOVA_DIAGNOSTIC(err_cannot_infer_type, Error, "E0302", "cannot infer type")
+NOVA_DIAGNOSTIC(err_incompatible_types, Error, "E0303", "incompatible types")
+NOVA_DIAGNOSTIC(err_invalid_cast, Error, "E0304", "invalid cast")
+NOVA_DIAGNOSTIC(err_no_implicit_conversion, Error, "E0305", "no implicit conversion")
+
+// Semantic errors (4xx)
+NOVA_DIAGNOSTIC(err_undefined_variable, Error, "E0001", "undefined variable")
+NOVA_DIAGNOSTIC(err_undefined_function, Error, "E0001", "undefined function")
+NOVA_DIAGNOSTIC(err_undefined_type, Error, "E0001", "undefined type")
+NOVA_DIAGNOSTIC(err_redefinition, Error, "E0003", "redefinition")
+NOVA_DIAGNOSTIC(err_wrong_argument_count, Error, "E0005", "wrong argument count")
+NOVA_DIAGNOSTIC(err_wrong_argument_type, Error, "E0306", "wrong argument type")
+NOVA_DIAGNOSTIC(err_not_callable, Error, "E0004", "value is not callable")
+NOVA_DIAGNOSTIC(err_not_indexable, Error, "E0401", "value is not indexable")
+NOVA_DIAGNOSTIC(err_invalid_operand, Error, "E0402", "invalid operand")
+NOVA_DIAGNOSTIC(err_missing_return, Error, "E0009", "missing return")
+NOVA_DIAGNOSTIC(err_unreachable_code, Error, "E0403", "unreachable code")
+
+// Ownership/Borrow errors (5xx)
+NOVA_DIAGNOSTIC(err_use_after_move, Error, "E0501", "use after move")
+NOVA_DIAGNOSTIC(err_double_move, Error, "E0502", "double move")
+NOVA_DIAGNOSTIC(err_borrow_of_moved_value, Error, "E0503", "borrow of moved value")
+NOVA_DIAGNOSTIC(err_cannot_borrow_as_mutable, Error, "E0504", "cannot borrow as mutable")
+NOVA_DIAGNOSTIC(err_cannot_move_borrowed, Error, "E0505", "cannot move borrowed value")
+NOVA_DIAGNOSTIC(err_mutable_borrow_conflict, Error, "E0506", "conflicting mutable borrows")
+NOVA_DIAGNOSTIC(err_dangling_reference, Error, "E0507", "dangling reference")
+NOVA_DIAGNOSTIC(err_lifetime_mismatch, Error, "E0508", "lifetime mismatch")
+NOVA_DIAGNOSTIC(err_assign_to_immutable, Error, "E0006", "cannot assign to immutable value")
+
+// Warnings (9xx)
+NOVA_DIAGNOSTIC(warn_unused_variable, Warning, "W0901", "unused variable")
+NOVA_DIAGNOSTIC(warn_unused_function, Warning, "W0902", "unused function")
+NOVA_DIAGNOSTIC(warn_unused_import, Warning, "W0903", "unused import")
+NOVA_DIAGNOSTIC(warn_unreachable_code, Warning, "W0904", "unreachable code")
+NOVA_DIAGNOSTIC(warn_shadowing_variable, Warning, "W0905", "variable shadows previous binding")
+NOVA_DIAGNOSTIC(warn_implicit_conversion, Warning, "W0906", "implicit conversion")
+NOVA_DIAGNOSTIC(warn_deprecated, Warning, "W0907", "deprecated")
+
+// Notes (informational)
+NOVA_DIAGNOSTIC(note_declared_here, Note, "N0001", "declared here")
+NOVA_DIAGNOSTIC(note_previous_borrow_here, Note, "N0002", "previous borrow here")
+NOVA_DIAGNOSTIC(note_moved_here, Note, "N0003", "moved here")
+NOVA_DIAGNOSTIC(note_consider_borrowing, Note, "N0004", "consider borrowing")
+
+// Fatal errors
+NOVA_DIAGNOSTIC(fatal_internal_compiler_error, Fatal, "F0001", "internal compiler error")
+NOVA_DIAGNOSTIC(fatal_too_many_errors, Fatal, "F0002", "too many errors emitted")

@@ -75,6 +75,8 @@ Requirements:
 
 Nova Core defines columns in terms of byte offsets (see `docs/language-spec.md` Appendix A.5). A renderer may expand tabs for display, but location math must remain correct and deterministic.
 
+Note: because columns are byte-based, caret alignment may not match visual character widths for non-ASCII text (e.g. Unicode characters inside string/char literals). This is acceptable for the MVP.
+
 ### 4.2 Multi-line spans
 
 Multi-line highlights are allowed, but not required for the MVP. For early milestones:

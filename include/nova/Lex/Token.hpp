@@ -13,7 +13,9 @@ private:
     TokenKind kind_;
 
     struct Flags {
+        // whether the token is at the start of a new line, useful for formatting
         bool at_start_of_line : 1;
+        // whether the token has leading whitespace, useful for formatting
         bool has_leading_space : 1;
         uint8_t reserved : 6;
     } flags_;
@@ -28,6 +30,7 @@ public:
     TokenKind get_kind() const { return kind_; }
     SourceLocation get_location() const { return loc_; }
     uint32_t get_length() const { return length_; }
+    // plus length to get the end location
     SourceRange get_source_range() const {
         return SourceRange(loc_, loc_.get_offset_location(length_));
     }
@@ -53,7 +56,7 @@ public:
     bool is_one_of(TokenKind k1, TokenKind k2) const {
         return is(k1) || is(k2);
     }
-
+    //recursive variadic template
     template<typename... Ts>
     bool is_one_of(TokenKind k1, TokenKind k2, Ts... ks) const {
         return is(k1) || is_one_of(k2, ks...);
@@ -62,7 +65,8 @@ public:
     bool is_literal() const {
         return kind_ == TokenKind::numeric_constant ||
                kind_ == TokenKind::string_literal ||
-               kind_ == TokenKind::char_constant;
+               kind_ == TokenKind::char_constant ||
+               kind_ == TokenKind::floating_constant;
     }
 };
 

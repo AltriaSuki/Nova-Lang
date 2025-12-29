@@ -96,6 +96,7 @@ let emoji: char = '😀'
 
 // String slice (immutable view into string data)
 let greeting: str = "Hello, Nova!"
+let greeting_zh: str = "你好，Nova!"
 
 // String (owned, growable)
 let mut name = String::from("Nova")

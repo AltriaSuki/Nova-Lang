@@ -3,45 +3,18 @@
 namespace nova {
 
 enum class TokenKind {
-    // Keywords
-    kw_func, kw_let, kw_mut, kw_class, kw_trait, kw_impl,
-    kw_if, kw_else, kw_match, kw_while, kw_for, kw_return,
-    kw_pub, kw_priv, kw_mod, kw_use, kw_unsafe,
-    kw_true, kw_false,
-
-    // Type keywords
-    kw_i8, kw_i16, kw_i32, kw_i64,
-    kw_u8, kw_u16, kw_u32, kw_u64,
-    kw_f32, kw_f64,
-    kw_bool, kw_str, kw_char,
-
-    // Punctuation
-    plus, minus, star, slash, percent,
-    equal, equalequal, exclaimequal,
-    less, lessequal, greater, greaterequal,
-    amp, ampamp,
-    pipe, pipepipe,
-    arrow, fatarrow,
-    period, coloncolon,
-
-    comma, semi, colon,
-    l_paren, r_paren,
-    l_brace, r_brace,
-    l_square, r_square,
-
-    // Literals
-    numeric_constant,
-    string_literal,
-    char_constant,
-
-    // Identifiers
-    identifier,
-
-    // Special
-    eof,
-    unknown,
-    //this must be last to get the count of tokens
-    count
+#define NOVA_KEYWORD(name, spelling) name,
+#define NOVA_TYPE_KEYWORD(name, spelling) name,
+#define NOVA_PUNCT(name, spelling) name,
+#define NOVA_LITERAL(name, token_name) name,
+#define NOVA_TOKEN(name, token_name) name,
+#include "nova/Lex/TokenKinds.def"
+#undef NOVA_TOKEN
+#undef NOVA_LITERAL
+#undef NOVA_PUNCT
+#undef NOVA_TYPE_KEYWORD
+#undef NOVA_KEYWORD
+    count,
 };
 //this is english word of the token
 const char* get_token_name(TokenKind kind);

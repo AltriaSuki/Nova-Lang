@@ -25,6 +25,11 @@ Documentation conventions are described in `docs/writing-style.md`.
 
 Nova-Lang is currently a scaffolded compiler project. Some core utilities are implemented (source locations, source manager, token kind tables), while most higher-level subsystems have placeholder APIs and/or empty `.cpp` implementations.
 
+Unicode note (current target contract):
+- Source files are UTF-8 text.
+- Identifiers are ASCII-only in Nova Core.
+- Unicode is supported inside string and character literals.
+
 When reading documents:
 - Treat `language-spec.md` as the *target contract* (what is intended to be defined precisely).
 - Treat `features.md` as an *aspirational design catalogue*; syntax and examples may change.
