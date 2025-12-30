@@ -247,33 +247,13 @@ namespace nova {
 
     void Lexer::lex_punctuation(Token& result,const char* start,SourceLocation loc) {
         //current maximum punctuation length is 2
-        uint8_t max_punct_length = 2;
-        uint8_t length = 0;
+        char current_char = peek();
+        //use local pointer to avoid memory access overhead
+        auto * cur = buffer_ptr_;
+        cur++;
         TokenKind kind = TokenKind::unknown;
-        for(uint8_t len = max_punct_length; len >= 1; --len) {
-            std::string_view punct_text(start,len);
-            bool found = false;
-            #define NOVA_PUNCT(name, spelling) \
-                if(punct_text == spelling) {\
-                    kind = TokenKind::name;\
-                    length = len;\
-                    found = true;\
-                }
-            #define NOVA_KEYWORD(name, spelling)
-            #define NOVA_TYPE_KEYWORD(name, spelling)
-            #define NOVA_LITERAL(name, token_name)
-            #define NOVA_TOKEN(name, token_name)
-            #include "nova/Lex/TokenKinds.def"
-            #undef NOVA_TOKEN
-            #undef NOVA_LITERAL
-            #undef NOVA_TYPE_KEYWORD
-            #undef NOVA_KEYWORD
-            #undef NOVA_PUNCT
-            if(found) {
-                buffer_ptr_ += length;
-                form_token(result,kind,start,loc);
-                return;
-            }
+        switch(current_char){
+            
         }
         //unknown punctuation, consume char until whitespace
         while(buffer_ptr_ < buffer_end_ && !is_whitespace(*buffer_ptr_)) 
