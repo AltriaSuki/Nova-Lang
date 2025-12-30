@@ -24,8 +24,8 @@ namespace nova {
 #undef NOVA_KEYWORD
 	    }
 
-    void IdentifierTable::add_identifier(const char* name) {
-        auto info = std::make_unique<IdentifierInfo>(name, TokenKind::identifier, false);
+    void IdentifierTable::add_identifier(std::string_view name) {
+        auto info = std::make_unique<IdentifierInfo>(std::string(name), TokenKind::identifier, false);
         table_.emplace(info->name, info.get());
         storage_.push_back(std::move(info));
     }

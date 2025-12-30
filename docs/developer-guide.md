@@ -70,6 +70,10 @@ cd build
 ctest --output-on-failure
 ```
 
+You can also run the binaries directly:
+- unit tests: `./build/bin/novaTests`
+- micro-benchmark: `./build/bin/nova-bench`
+
 ## Formatting
 
 When `clang-format` is available:

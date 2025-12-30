@@ -60,14 +60,17 @@ namespace nova {
             }else if(*buffer_ptr_ == '/' && (buffer_ptr_ + 1) < buffer_end_){
                 if(*(buffer_ptr_ + 1) == '/'){
                     // single line comment
+                    seen_space_ = true;
                     buffer_ptr_ += 2;
                     while(buffer_ptr_ < buffer_end_ && *buffer_ptr_ !='\n')
                         ++buffer_ptr_;
-                    //current char is '\n' or end of buffer
-                    ++buffer_ptr_;
+                    if(buffer_ptr_ < buffer_end_ && *buffer_ptr_ == '\n') {
+                        ++buffer_ptr_;
+                    }
                     at_start_of_line_ = true;
                 }else if(*(buffer_ptr_ + 1) == '*') {
                     //mutilple line comment
+                    seen_space_ = true;
                     buffer_ptr_ += 2;
                     while(buffer_ptr_ + 1 < buffer_end_){
                         if(*buffer_ptr_ == '*' && *(buffer_ptr_ + 1) == '/'){
@@ -80,6 +83,8 @@ namespace nova {
                 }else {
                     break;//invalid comment start
                 }
+            } else {
+                break;
             }
         }
     }
@@ -148,7 +153,7 @@ namespace nova {
             form_token(result,info->token_kind,start,loc);
             result.set_identifier_info(info);
         }else if(!info){
-            identifier_table_.add_identifier(ident_text.data());
+            identifier_table_.add_identifier(ident_text);
             info = identifier_table_.get(ident_text);
             form_token(result,TokenKind::identifier,start,loc);
             result.set_identifier_info(info);
@@ -192,7 +197,7 @@ namespace nova {
             if(buffer_ptr_ < buffer_end_ && (*buffer_ptr_ == 'e' || *buffer_ptr_ == 'E')) {
                 is_float = true;
                 ++buffer_ptr_;
-                if(buffer_ptr_ < buffer_end_ && (*buffer_ptr_ == '+') || *buffer_ptr_ == '-') 
+                if(buffer_ptr_ < buffer_end_ && (*buffer_ptr_ == '+' || *buffer_ptr_ == '-'))
                     ++buffer_ptr_;
                 while(buffer_ptr_ < buffer_end_ && isdigit(*buffer_ptr_))
                     ++buffer_ptr_;
@@ -254,7 +259,15 @@ namespace nova {
                     length = len;\
                     found = true;\
                 }
+            #define NOVA_KEYWORD(name, spelling)
+            #define NOVA_TYPE_KEYWORD(name, spelling)
+            #define NOVA_LITERAL(name, token_name)
+            #define NOVA_TOKEN(name, token_name)
             #include "nova/Lex/TokenKinds.def"
+            #undef NOVA_TOKEN
+            #undef NOVA_LITERAL
+            #undef NOVA_TYPE_KEYWORD
+            #undef NOVA_KEYWORD
             #undef NOVA_PUNCT
             if(found) {
                 buffer_ptr_ += length;

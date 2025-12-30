@@ -14,7 +14,7 @@ Nova-Lang is organized as a set of libraries with public headers under `include/
 **Lex**
 - `include/nova/Lex/TokenKinds.hpp`
 - `include/nova/Lex/Token.hpp`
-- `include/nova/Lex/Lexer.hpp` (API present; implementation is incomplete today)
+- `include/nova/Lex/Lexer.hpp` (implementation exists; still evolving toward the full language spec)
 
 **Other subsystems**
 

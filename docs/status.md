@@ -12,6 +12,9 @@ Nova-Lang is intentionally built as a set of libraries. Many headers and CMake t
 - Output locations:
   - executables: `build/bin/`
   - libraries: `build/lib/`
+- Common developer binaries:
+  - unit tests: `build/bin/novaTests`
+  - micro-benchmark: `build/bin/nova-bench`
 
 Notes:
 - The LLVM backend is optional. Use `-DNOVA_ENABLE_LLVM=OFF` to force-disable it; otherwise it is built only when LLVM is found by CMake.
@@ -54,7 +57,8 @@ Files:
 
 Status:
 - **Implemented**: token kind tables and spelling helpers.
-- **Scaffold**: `Token.cpp` and `Lexer.cpp` are currently empty/placeholder (lexer not implemented yet).
+- **Partial**: `Lexer` implements a usable subset (identifiers/keywords, numbers, strings/chars, punctuation, whitespace/comments) and is exercised by `tests/unit/LexerTest.cpp`.
+- **Scaffold**: `Token` is currently header-only; `lib/Lex/Token.cpp` is empty.
 
 ### `Parse/`, `AST/`, `Sema/`
 

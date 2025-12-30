@@ -1,6 +1,6 @@
 # Benchmarks
 
-**Status:** Not yet implemented.
+**Status:** Lexer benchmark implemented (`nova-bench`).
 
 ## Purpose
 This directory is reserved for benchmarks that measure compiler performance.
@@ -16,6 +16,12 @@ This directory is reserved for benchmarks that measure compiler performance.
 ```bash
 cd build
 ./bin/nova-bench
+```
+
+Examples:
+```bash
+./bin/nova-bench --bytes 1000000 --repeat 200
+./bin/nova-bench --file ../examples/hello.nova --repeat 1000
 ```
 
 ## Tracking

@@ -38,6 +38,18 @@ End-to-end tests should cover:
 - compiling a `.nova` program and running it (interpreter or LLVM backend)
 - verifying stdout/stderr and exit codes
 
+### 1.4 Benchmarks (optional)
+
+Location: `tests/benchmarks/`
+
+Benchmarks should cover:
+- lexer throughput (tokens/s, MiB/s)
+- parser throughput (once parsing exists)
+- compilation time for representative programs
+
+Current:
+- `build/bin/nova-bench` — lexer micro-benchmark (run in Release mode for meaningful numbers)
+
 ---
 
 ## 2. Deterministic “Dump” Outputs
@@ -106,7 +118,7 @@ After `nova` provides dump flags, a practical pattern is:
 - input: `.nova` file under `tests/cases/<area>/name.nova`
 - expected: `.txt` file under `tests/cases/<area>/name.<dump>.txt`
 
-Example:
+Example (suggested layout; directories may not exist yet):
 
 - `tests/cases/lex/keywords.nova`
 - `tests/cases/lex/keywords.tokens.txt`

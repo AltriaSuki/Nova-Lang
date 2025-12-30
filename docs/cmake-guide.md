@@ -47,7 +47,10 @@ Nova-Lang/
 │   └── nova-repl/CMakeLists.txt # nova-repl executable
 └── tests/
     ├── CMakeLists.txt          # Test config, GTest fetch
-    └── unit/CMakeLists.txt     # Unit test executable
+    ├── unit/CMakeLists.txt     # Unit test executable
+    ├── benchmarks/CMakeLists.txt # Micro-bench executable(s)
+    ├── integration/            # Placeholder (not wired into CMake yet)
+    └── e2e/                    # Placeholder (not wired into CMake yet)
 ```
 
 ### Library Dependency Graph

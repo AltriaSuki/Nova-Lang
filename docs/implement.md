@@ -34,9 +34,9 @@ Notes:
 
 ## Phase 1: Core Infrastructure (Week 1-2)
 
-- [ ] **SourceLocation** - `include/nova/Basic/SourceLocation.hpp`, `lib/Basic/SourceLocation.cpp` — Encode file positions
-- [ ] **SourceManager** - `include/nova/Basic/SourceManager.hpp`, `lib/Basic/SourceManager.cpp` — Manage source files
-- [ ] **IdentifierTable** - `include/nova/Basic/IdentifierTable.hpp`, `lib/Basic/IdentifierTable.cpp` — Intern strings/keywords
+- [x] **SourceLocation** - `include/nova/Basic/SourceLocation.hpp`, `lib/Basic/SourceLocation.cpp` — Encode file positions
+- [x] **SourceManager** - `include/nova/Basic/SourceManager.hpp`, `lib/Basic/SourceManager.cpp` — Manage source files
+- [x] **IdentifierTable** - `include/nova/Basic/IdentifierTable.hpp`, `lib/Basic/IdentifierTable.cpp` — Intern strings/keywords
 - [ ] **Diagnostic** - `include/nova/Basic/Diagnostic.hpp`, `lib/Basic/Diagnostic.cpp` — Error message definitions
 - [ ] **DiagnosticEngine** - `include/nova/Basic/DiagnosticEngine.hpp`, `lib/Basic/DiagnosticEngine.cpp` — Error reporting
 
@@ -44,23 +44,24 @@ Notes:
 
 ## Phase 2: Lexer (Week 3-4)
 
-- [ ] **TokenKinds** - `include/nova/Lex/TokenKinds.hpp`, `lib/Lex/TokenKinds.cpp` — Define token types
-- [ ] **Token** - `include/nova/Lex/Token.hpp`, `lib/Lex/Token.cpp` — Token class
-- [ ] **Lexer** - `include/nova/Lex/Lexer.hpp`, `lib/Lex/Lexer.cpp` — Tokenization
-- [ ] **LexerTest** - `tests/unit/LexerTest.cpp` — Lexer unit tests
+- [x] **TokenKinds** - `include/nova/Lex/TokenKinds.hpp`, `lib/Lex/TokenKinds.cpp` — Define token types
+- [x] **Token** - `include/nova/Lex/Token.hpp` — Token class (currently header-only)
+- [x] **Lexer** - `include/nova/Lex/Lexer.hpp`, `lib/Lex/Lexer.cpp` — Tokenization
+- [x] **LexerTest** - `tests/unit/LexerTest.cpp` — Lexer unit tests
+- [x] **Lexer Benchmark** - `tests/benchmarks/nova-bench.cpp` — Lexer throughput micro-benchmark
 
 ---
 
 ## Phase 3: Parser & AST (Week 5-8)
 
-- [ ] **ASTNode** - `include/nova/AST/ASTNode.hpp` — Base node class
-- [ ] **Type** - `include/nova/AST/Type.hpp`, `lib/AST/Type.cpp` — Type representations
+- [ ] **Type** - `include/nova/AST/Type.hpp` — Type representations
 - [ ] **Decl** - `include/nova/AST/Decl.hpp` — Declarations
 - [ ] **Stmt** - `include/nova/AST/Stmt.hpp` — Statements
 - [ ] **Expr** - `include/nova/AST/Expr.hpp` — Expressions
 - [ ] **ASTContext** - `include/nova/AST/ASTContext.hpp`, `lib/AST/ASTContext.cpp` — AST memory arena
+- [ ] **ASTVisitor** - `include/nova/AST/ASTVisitor.hpp` — AST traversal utilities
 - [ ] **Parser** - `include/nova/Parse/Parser.hpp`, `lib/Parse/Parser.cpp` — Main parser
-- [ ] **ParserTest** - `tests/unit/ParserTest.cpp` — Parser unit tests
+- [ ] **ParserTest** - `tests/unit/ParserTest.cpp` — Parser unit tests (planned)
 
 ---
 
@@ -103,10 +104,9 @@ Notes:
 
 ## Phase 8: Ownership & Borrowing (Week 27-34)
 
-- [ ] **Ownership** - `include/nova/Analysis/Ownership.hpp`, `lib/Analysis/OwnershipAnalysis.cpp` — Track ownership state
-- [ ] **Loan** - `include/nova/Analysis/Loan.hpp` — Borrow tracking
+- [ ] **OwnershipAnalysis** - `include/nova/Analysis/OwnershipAnalysis.hpp`, `lib/Analysis/OwnershipAnalysis.cpp` — Track ownership state
 - [ ] **Lifetime** - `include/nova/Analysis/Lifetime.hpp` — Lifetime representation
-- [ ] **CFG** - `include/nova/Analysis/CFG.hpp`, `lib/Analysis/CFGBuilder.cpp` — Control flow graph
+- [ ] **CFG** - `include/nova/Analysis/CFG.hpp` — Control flow graph
 - [ ] **BorrowChecker** - `include/nova/Analysis/BorrowChecker.hpp`, `lib/Analysis/BorrowChecker.cpp` — Borrow checking
 - [ ] **BorrowCheckerTest** - `tests/unit/BorrowCheckerTest.cpp` — Borrow checker tests
 
@@ -141,10 +141,10 @@ Notes:
 
 ## Phase 12: LLVM Backend (Week 49-56)
 
-- [ ] **LLVMCodeGen** - `include/nova/CodeGen/LLVMCodeGen.hpp`, `lib/CodeGen/LLVMCodeGen.cpp` — LLVM IR generation
-- [ ] **LLVMTypeGen** - `lib/CodeGen/LLVMTypeGen.cpp` — Type mapping
-- [ ] **LLVMExprGen** - `lib/CodeGen/LLVMExprGen.cpp` — Expression codegen
-- [ ] **LLVMStmtGen** - `lib/CodeGen/LLVMStmtGen.cpp` — Statement codegen
+- [ ] **CodeGenModule** - `include/nova/CodeGen/CodeGenModule.hpp`, `lib/CodeGen/CodeGenModule.cpp` — Codegen entry point
+- [ ] **LLVMCodeGen** - `include/nova/CodeGen/LLVM/LLVMCodeGen.hpp`, `lib/CodeGen/LLVM/LLVMCodeGen.cpp` — LLVM IR generation
+- [ ] **LLVMTypeConverter** - `include/nova/CodeGen/LLVM/LLVMTypeConverter.hpp`, `lib/CodeGen/LLVM/LLVMTypeConverter.cpp` — Type mapping
+- [ ] **LLVMExprEmitter** - `include/nova/CodeGen/LLVM/LLVMExprEmitter.hpp`, `lib/CodeGen/LLVM/LLVMExprEmitter.cpp` — Expression codegen
 
 ---
 

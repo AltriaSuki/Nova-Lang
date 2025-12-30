@@ -41,10 +41,13 @@ Tokenize Nova source code into a stream of tokens.
 - `include/nova/Basic/SourceManager.hpp`
 - `include/nova/Basic/IdentifierTable.hpp`
 - `include/nova/Lex/TokenKinds.hpp`
+- `include/nova/Lex/Token.hpp`
+- `include/nova/Lex/Lexer.hpp`
 - `lib/Basic/SourceLocation.cpp`
 - `lib/Basic/SourceManager.cpp`
 - `lib/Basic/IdentifierTable.cpp`
 - `lib/Lex/TokenKinds.cpp`
+- `lib/Lex/Lexer.cpp`
 
 #### To Implement
 
@@ -54,25 +57,23 @@ Tokenize Nova source code into a stream of tokens.
 | `lib/Basic/Diagnostic.cpp` | [ ] Implement get_diagnostic_format(), get_default_severity() |
 | `include/nova/Basic/DiagnosticEngine.hpp` | [ ] DiagnosticBuilder, DiagnosticEngine classes |
 | `lib/Basic/DiagnosticEngine.cpp` | [ ] Implement report(), emit(), format_diagnostic() |
-| `include/nova/Lex/Token.hpp` | [ ] Token class with kind, location, spelling |
-| `lib/Lex/Token.cpp` | [ ] Token methods: getString(), is(), isOneOf() |
-| `include/nova/Lex/Lexer.hpp` | [ ] Lexer class declaration |
-| `lib/Lex/Lexer.cpp` | [ ] lex(), skip_whitespace_and_comments() |
-| | [ ] lex_identifier() - keywords + identifiers |
-| | [ ] lex_number() - int, float, hex, binary, octal |
-| | [ ] lex_string() - string literals with escapes |
-| | [ ] lex_char() - character literals |
-| | [ ] All operators and punctuation |
+| `include/nova/Lex/Token.hpp` | [x] Token class with kind, location, spelling (currently header-only) |
+| `lib/Lex/Token.cpp` | [ ] Optional: move non-trivial methods out of header |
+| `include/nova/Lex/Lexer.hpp` | [x] Lexer class declaration |
+| `lib/Lex/Lexer.cpp` | [x] lex(), whitespace/comments, identifiers/keywords, numbers, strings/chars, punctuation |
+| | [ ] Extend toward full `docs/language-spec.md` coverage |
 
 ### Tests
 | File | Tests |
 |------|-------|
-| `tests/unit/LexerTest.cpp` | [ ] Keywords tokenization |
-| | [ ] Identifier tokenization |
-| | [ ] Number literals (all formats) |
+| `tests/unit/LexerTest.cpp` | [x] Keywords tokenization |
+| | [x] Identifier tokenization |
+| | [x] Number literals (decimal/hex) |
+| | [x] Basic string/char literals |
 | | [ ] String literals with escapes |
 | | [ ] All operators |
-| | [ ] Comments (line and block) |
+| | [x] Line comments |
+| | [ ] Block comments |
 | | [ ] Error recovery |
 
 ### Milestone
@@ -100,7 +101,8 @@ Parse tokens into an Abstract Syntax Tree.
 
 | File | Contents |
 |------|----------|
-| `ASTNode.hpp` | [ ] Base ASTNode class, NodeKind enum |
+| `ASTContext.hpp` | [ ] AST lifetime / allocation strategy |
+| `ASTVisitor.hpp` | [ ] Visitor utilities for AST traversal |
 | `Type.hpp` | [ ] Type, BuiltinType, PointerType, ReferenceType, ArrayType, TupleType |
 | `Decl.hpp` | [ ] Decl base, VarDecl, FuncDecl, ParamDecl, StructDecl, EnumDecl |
 | `Stmt.hpp` | [ ] Stmt base, CompoundStmt, IfStmt, WhileStmt, ForStmt, ReturnStmt, ExprStmt |
@@ -662,15 +664,15 @@ Compile to native code via LLVM.
 
 | File | Tasks |
 |------|-------|
-| `include/nova/CodeGen/LLVMCodeGen.hpp` | [ ] LLVM code generator class |
-| `lib/CodeGen/LLVMCodeGen.cpp` | [ ] Module setup |
+| `include/nova/CodeGen/LLVM/LLVMCodeGen.hpp` | [ ] LLVM code generator class |
+| `lib/CodeGen/LLVM/LLVMCodeGen.cpp` | [ ] Module setup |
 | | [ ] Function generation |
 | | [ ] Basic block management |
-| `lib/CodeGen/LLVMTypeGen.cpp` | [ ] Nova type → LLVM type |
-| `lib/CodeGen/LLVMExprGen.cpp` | [ ] Generate expressions |
-| `lib/CodeGen/LLVMStmtGen.cpp` | [ ] Generate statements |
-| `lib/CodeGen/LLVMDeclGen.cpp` | [ ] Generate declarations |
-| `lib/CodeGen/LLVMBuiltin.cpp` | [ ] Built-in function implementations |
+| `include/nova/CodeGen/LLVM/LLVMTypeConverter.hpp` | [ ] Nova type → LLVM type |
+| `lib/CodeGen/LLVM/LLVMTypeConverter.cpp` | [ ] Type lowering implementation |
+| `include/nova/CodeGen/LLVM/LLVMExprEmitter.hpp` | [ ] Generate expressions |
+| `lib/CodeGen/LLVM/LLVMExprEmitter.cpp` | [ ] Expression lowering implementation |
+| `lib/CodeGen/LLVM/` | [ ] (Planned) statements, declarations, builtins |
 
 ### LLVM Integration Steps
 ```
@@ -987,13 +989,14 @@ error[E0382]: borrow of moved value: `s`
 Nova-Lang/
 ├── include/nova/
 │   ├── AST/
-│   │   ├── ASTNode.hpp
+│   │   ├── ASTContext.hpp
+│   │   ├── ASTVisitor.hpp
 │   │   ├── Decl.hpp
 │   │   ├── Expr.hpp
+│   │   ├── Pattern.hpp
 │   │   ├── Stmt.hpp
 │   │   ├── Type.hpp
-│   │   ├── Pattern.hpp
-│   │   └── Module.hpp
+│   │   └── (AST node implementations: TODO)
 │   ├── Analysis/
 │   │   ├── BorrowChecker.hpp
 │   │   ├── OwnershipAnalysis.hpp
@@ -1002,74 +1005,64 @@ Nova-Lang/
 │   ├── Basic/
 │   │   ├── Diagnostic.hpp
 │   │   ├── DiagnosticEngine.hpp
+│   │   ├── IdentifierTable.hpp
 │   │   ├── SourceLocation.hpp
 │   │   ├── SourceManager.hpp
-│   │   └── IdentifierTable.hpp
+│   │   └── (other utilities: TODO)
 │   ├── CodeGen/
-│   │   ├── Interpreter/
-│   │   │   ├── Interpreter.hpp
-│   │   │   ├── Value.hpp
-│   │   │   └── Environment.hpp
+│   │   ├── CodeGenModule.hpp
 │   │   └── LLVM/
-│   │       └── LLVMCodeGen.hpp
+│   │       ├── LLVMCodeGen.hpp
+│   │       ├── LLVMExprEmitter.hpp
+│   │       └── LLVMTypeConverter.hpp
+│   ├── Driver/
+│   │   └── Driver.hpp
+│   ├── Interpreter/
+│   │   ├── Environment.hpp
+│   │   ├── Interpreter.hpp
+│   │   └── Value.hpp
+│   ├── IR/
+│   │   ├── IR.hpp
+│   │   ├── IRBuilder.hpp
+│   │   └── Module.hpp
 │   ├── Lex/
 │   │   ├── Lexer.hpp
 │   │   ├── Token.hpp
+│   │   ├── TokenKinds.def
 │   │   └── TokenKinds.hpp
-│   ├── Macro/
-│   │   ├── MacroParser.hpp
-│   │   └── MacroExpander.hpp
 │   ├── Parse/
 │   │   └── Parser.hpp
-│   └── Sema/
-│       ├── Sema.hpp
-│       ├── Scope.hpp
-│       ├── Symbol.hpp
-│       ├── TraitResolver.hpp
-│       └── GenericResolver.hpp
+│   ├── Runtime/
+│   │   └── Builtin.hpp
+│   ├── Sema/
+│   │   ├── Scope.hpp
+│   │   ├── Sema.hpp
+│   │   ├── Symbol.hpp
+│   │   └── TypeChecker.hpp
+│   └── Transforms/
+│       └── Optimizer.hpp
 ├── lib/
 │   └── (matching .cpp files)
 ├── stdlib/
-│   ├── core/
-│   │   ├── prelude.nova
-│   │   ├── option.nova
-│   │   ├── result.nova
-│   │   ├── iter.nova
-│   │   ├── string.nova
-│   │   ├── ops.nova
-│   │   ├── cmp.nova
-│   │   ├── clone.nova
-│   │   ├── default.nova
-│   │   ├── fmt.nova
-│   │   ├── mem.nova
-│   │   ├── ptr.nova
-│   │   └── slice.nova
-│   ├── collections/
-│   │   ├── vec.nova
-│   │   ├── hashmap.nova
-│   │   ├── hashset.nova
-│   │   ├── linkedlist.nova
-│   │   └── deque.nova
-│   ├── io/
-│   │   ├── mod.nova
-│   │   └── file.nova
-│   ├── sync/
-│   │   ├── mod.nova
-│   │   ├── mutex.nova
-│   │   ├── rwlock.nova
-│   │   └── arc.nova
-│   ├── thread/
-│   │   └── mod.nova
 │   ├── async/
-│   │   └── mod.nova
-│   └── error.nova
-│   └── iter/
+│   ├── collections/
+│   ├── core/
+│   ├── fs/
+│   ├── sync/
+│   ├── io/
+│   ├── math/
+│   ├── net/
+│   ├── process/
+│   ├── thread/
+│   └── time/
 ├── tools/
 │   ├── nova/
 │   └── nova-repl/
 └── tests/
-    ├── unit/
-    └── integration/
+    ├── benchmarks/
+    ├── e2e/
+    ├── integration/
+    └── unit/
 ```
 
 ---

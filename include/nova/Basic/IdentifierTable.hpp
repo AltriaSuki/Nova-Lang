@@ -44,7 +44,7 @@ public:
     IdentifierTable();
 
     [[nodiscard]] IdentifierInfo* get(std::string_view name);
-    void add_identifier(const char* name);
+    void add_identifier(std::string_view name);
 
 private:
     void add_keyword(const char* name, TokenKind kind);
