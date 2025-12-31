@@ -44,12 +44,32 @@ private:
         return static_cast<uint32_t>(buffer_ptr_ - buffer_start_);
     }
 
-    static bool is_identifier_start(char c);
-    static bool is_identifier_continue(char c);
-    static bool is_digit(char c);
-    static bool is_hex_digit(char c);
-    static bool is_octal_digit(char c);
-    static bool is_binary_digit(char c);
+    static inline bool is_identifier_start(char c){
+        return (c >= 'a' && c <= 'z') ||
+               (c >= 'A' && c <= 'Z') ||
+               c == '_';
+    }
+    static inline bool is_identifier_continue(char c){
+        return is_identifier_start(c) || is_digit(c);
+    }
+    static inline bool is_digit(char c){
+        return c >= '0' && c <= '9';
+    }
+    static inline bool is_hex_digit(char c){
+        return (c >= '0' && c <= '9') ||
+               (c >= 'a' && c <= 'f') ||
+               (c >= 'A' && c <= 'F');
+    }
+    static inline bool is_octal_digit(char c){
+        return c >= '0' && c <= '7';
+    }
+    static inline bool is_binary_digit(char c){
+        return c == '0' || c == '1';
+    }
+
+    static inline bool is_whitespace(char c){
+        return c==' ' || c=='\t' || c=='\n' || c=='\r';
+    }
     static int hex_value(char c);
     static int octal_value(char c);
     static int binary_value(char c);

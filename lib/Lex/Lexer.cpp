@@ -15,11 +15,6 @@ namespace nova {
                     buffer_end_ = nullptr;
                 }
             }
-    namespace{
-        bool is_whitespace(char c){
-            return c==' ' || c=='\t' || c=='\n' || c=='\r';
-        }
-    }
     // lex token and store result in 'result'
     // token include identifiers, keywords, literals, punctuations
     void Lexer::lex(Token& result){
@@ -64,8 +59,7 @@ namespace nova {
                     // single line comment
                     seen_space_ = true;
                     cur += 2;
-                    while(cur < end && *cur !='\n')
-                        ++cur;
+                    cur=static_cast<const char*>(memchr(cur, '\n', static_cast<size_t>(end - cur)));
                     if(cur < end && *cur == '\n') {
                         ++cur;
                     }
@@ -92,28 +86,6 @@ namespace nova {
         buffer_ptr_ = cur;
     }
 
-    bool Lexer::is_identifier_start(char c){
-        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
-    }
-
-    bool Lexer::is_identifier_continue(char c){
-        return is_identifier_start(c) || is_digit(c);
-    }
-
-    bool Lexer::is_digit(char c){
-        return c >= '0' && c <= '9';
-    }
-    bool Lexer::is_hex_digit(char c) {
-        return (c >= '0' && c <= '9') ||
-                (c >= 'a' && c <= 'f') ||
-                (c >= 'A' && c <= 'F');
-    }
-    bool Lexer::is_octal_digit(char c) {
-        return c >= '0' && c <= '7';
-    }
-    bool Lexer::is_binary_digit(char c) {
-        return c == '0' || c == '1';
-    }
     int Lexer::hex_value(char c) {
         if (c >= '0' && c <= '9') {
             return c - '0';
@@ -154,6 +126,7 @@ namespace nova {
         std::string_view ident_text(start,static_cast<size_t>(cur - start));
         //check if it's a keyword
         IdentifierInfo* info = identifier_table_.get(ident_text);
+        buffer_ptr_ = cur;
         if(info && info->is_keyword){
             form_token(result,info->token_kind,start,loc);
             result.set_identifier_info(info);
@@ -167,7 +140,6 @@ namespace nova {
             form_token(result,TokenKind::identifier,start,loc);
             result.set_identifier_info(info);
         }
-        buffer_ptr_ = cur;
     }
 
     void Lexer::lex_number(Token& result,const char* start,SourceLocation loc){
@@ -198,7 +170,7 @@ namespace nova {
             if(cur < end && *cur == '.') {
                 is_float = true;
                 ++cur;
-                while(cur < end && isdigit(*cur)) 
+                while(cur < end && is_digit(*cur)) 
                     ++cur;
             }
             //scientific notation
@@ -207,15 +179,15 @@ namespace nova {
                 ++cur;
                 if(cur < end && (*cur == '+' || *cur == '-'))
                     ++cur;
-                while(cur < end && isdigit(*cur))
+                while(cur < end && is_digit(*cur))
                     ++cur;
             }
         }
+        buffer_ptr_ = cur;
         if(is_float)
             form_token(result,TokenKind::floating_constant,start,loc);
         else
             form_token(result,TokenKind::numeric_constant,start,loc);
-        buffer_ptr_ = cur;
     }
 
     void Lexer::lex_string(Token& result,const char* start,SourceLocation loc) {
@@ -234,8 +206,8 @@ namespace nova {
                 ++cur;
             }
         }
-        form_token(result,TokenKind::string_literal,start,loc);
         buffer_ptr_ = cur;
+        form_token(result,TokenKind::string_literal,start,loc);
     }
     //char is unicode code point enclosed in single quotes
     void Lexer::lex_char(Token& result,const char* start,SourceLocation loc) {
@@ -257,8 +229,9 @@ namespace nova {
             }
         }
         //token example: 'a', '\n', '\u1234'
-        form_token(result,TokenKind::char_constant,start,loc);
         buffer_ptr_ = cur;
+        form_token(result,TokenKind::char_constant,start,loc);
+
     }
 
     void Lexer::lex_punctuation(Token& result,const char* start,SourceLocation loc) {
@@ -278,8 +251,9 @@ namespace nova {
             while(cur < buffer_end_ && !is_whitespace(*cur))
                 ++cur;
         }
-        form_token(result,kind,start,loc);
         buffer_ptr_ = cur;
+        form_token(result,kind,start,loc);
+        
     }
 
     //hitherto all functions are implemented
