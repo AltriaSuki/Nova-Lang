@@ -51,33 +51,35 @@ namespace nova {
 
     void Lexer::skip_whitespace_and_comments(){
         seen_space_ = false;
-        while(buffer_ptr_ < buffer_end_) {
-            if(is_whitespace(*buffer_ptr_)){
+        const char* cur=buffer_ptr_;
+        const char* end=buffer_end_;
+        while(cur < end) {
+            if(is_whitespace(*cur)){
                 seen_space_ = true;
-                if(*buffer_ptr_ == '\n')
+                if(*cur == '\n')
                     at_start_of_line_ = true;
-                ++buffer_ptr_;
-            }else if(*buffer_ptr_ == '/' && (buffer_ptr_ + 1) < buffer_end_){
-                if(*(buffer_ptr_ + 1) == '/'){
+                ++cur;
+            }else if(*cur == '/' && (cur + 1) < end){
+                if(*(cur + 1) == '/'){
                     // single line comment
                     seen_space_ = true;
-                    buffer_ptr_ += 2;
-                    while(buffer_ptr_ < buffer_end_ && *buffer_ptr_ !='\n')
-                        ++buffer_ptr_;
-                    if(buffer_ptr_ < buffer_end_ && *buffer_ptr_ == '\n') {
-                        ++buffer_ptr_;
+                    cur += 2;
+                    while(cur < end && *cur !='\n')
+                        ++cur;
+                    if(cur < end && *cur == '\n') {
+                        ++cur;
                     }
                     at_start_of_line_ = true;
-                }else if(*(buffer_ptr_ + 1) == '*') {
+                }else if(*(cur + 1) == '*') {
                     //mutilple line comment
                     seen_space_ = true;
-                    buffer_ptr_ += 2;
-                    while(buffer_ptr_ + 1 < buffer_end_){
-                        if(*buffer_ptr_ == '*' && *(buffer_ptr_ + 1) == '/'){
-                            buffer_ptr_ += 2;
+                    cur += 2;
+                    while(cur + 1 < end){
+                        if(*cur == '*' && *(cur + 1) == '/'){
+                            cur += 2;
                             break;
                         }
-                        ++buffer_ptr_;
+                        ++cur;
                     }
 
                 }else {
@@ -87,6 +89,7 @@ namespace nova {
                 break;
             }
         }
+        buffer_ptr_ = cur;
     }
 
     bool Lexer::is_identifier_start(char c){
@@ -144,9 +147,11 @@ namespace nova {
     }
 
     void Lexer::lex_identifier(Token& result,const char* start,SourceLocation loc) {
-        while(buffer_ptr_ < buffer_end_ && is_identifier_continue(*buffer_ptr_)) 
-            ++buffer_ptr_;
-        std::string_view ident_text(start,static_cast<size_t>(buffer_ptr_ - start));
+        const char* cur = buffer_ptr_;
+        const char* end = buffer_end_;
+        while(cur < end && is_identifier_continue(*cur)) 
+            ++cur;
+        std::string_view ident_text(start,static_cast<size_t>(cur - start));
         //check if it's a keyword
         IdentifierInfo* info = identifier_table_.get(ident_text);
         if(info && info->is_keyword){
@@ -162,103 +167,119 @@ namespace nova {
             form_token(result,TokenKind::identifier,start,loc);
             result.set_identifier_info(info);
         }
+        buffer_ptr_ = cur;
     }
 
     void Lexer::lex_number(Token& result,const char* start,SourceLocation loc){
         //decimal,hexadecimal,octal,binary literals
         //and floating point literals including scientific notation
         bool is_float = false;
-        if(*buffer_ptr_ == '0' && (buffer_ptr_ + 1) < buffer_end_) {
-            char next_char = *(buffer_ptr_ + 1);
+        const char* cur = buffer_ptr_;
+        const char* end = buffer_end_;
+        if(*cur == '0' && (cur + 1) < end) {
+            char next_char = *(cur + 1);
             if(next_char == 'x' || next_char == 'X') {
-                buffer_ptr_ += 2;
-                while(buffer_ptr_ < buffer_end_ && is_hex_digit(*buffer_ptr_)) 
-                    ++buffer_ptr_;   
+                cur += 2;
+                while(cur < end && is_hex_digit(*cur)) 
+                    ++cur;   
             }else if(next_char == 'b' || next_char == 'B') {
-                buffer_ptr_ += 2;
-                while(buffer_ptr_ < buffer_end_ && is_binary_digit(*buffer_ptr_)) 
-                    ++buffer_ptr_;
+                cur += 2;
+                while(cur < end && is_binary_digit(*cur)) 
+                    ++cur;
             }else if(next_char == 'o' || next_char == 'O') {
-                buffer_ptr_ += 2;
-                while(buffer_ptr_ < buffer_end_ && is_octal_digit(*buffer_ptr_)) 
-                    ++buffer_ptr_;
+                cur += 2;
+                while(cur < end && is_octal_digit(*cur)) 
+                    ++cur;
             }
         }else {
-            while(buffer_ptr_ < buffer_end_ && is_digit(*buffer_ptr_))
-                ++buffer_ptr_;
+            while(cur < end && is_digit(*cur))
+                ++cur;
             //check for floating point
-            if(buffer_ptr_ < buffer_end_ && *buffer_ptr_ == '.') {
+            if(cur < end && *cur == '.') {
                 is_float = true;
-                ++buffer_ptr_;
-                while(buffer_ptr_ < buffer_end_ && isdigit(*buffer_ptr_)) 
-                    ++buffer_ptr_;
+                ++cur;
+                while(cur < end && isdigit(*cur)) 
+                    ++cur;
             }
             //scientific notation
-            if(buffer_ptr_ < buffer_end_ && (*buffer_ptr_ == 'e' || *buffer_ptr_ == 'E')) {
+            if(cur < end && (*cur == 'e' || *cur == 'E')) {
                 is_float = true;
-                ++buffer_ptr_;
-                if(buffer_ptr_ < buffer_end_ && (*buffer_ptr_ == '+' || *buffer_ptr_ == '-'))
-                    ++buffer_ptr_;
-                while(buffer_ptr_ < buffer_end_ && isdigit(*buffer_ptr_))
-                    ++buffer_ptr_;
+                ++cur;
+                if(cur < end && (*cur == '+' || *cur == '-'))
+                    ++cur;
+                while(cur < end && isdigit(*cur))
+                    ++cur;
             }
         }
         if(is_float)
             form_token(result,TokenKind::floating_constant,start,loc);
         else
             form_token(result,TokenKind::numeric_constant,start,loc);
+        buffer_ptr_ = cur;
     }
 
     void Lexer::lex_string(Token& result,const char* start,SourceLocation loc) {
-        buffer_ptr_++; //skip opening "
-        while(buffer_ptr_ < buffer_end_) {
-            if(*buffer_ptr_ == '"') {
-                buffer_ptr_++;
+        const char* cur = buffer_ptr_;
+        const char* end = buffer_end_;
+        cur++; //skip opening "
+        while(cur < end) {
+            if(*cur == '"') {
+                cur++;
                 break;
-            }else if(*buffer_ptr_ == '\\') {
-                ++buffer_ptr_; //skip '\'
-                if(buffer_ptr_ < buffer_end_) 
-                    ++buffer_ptr_; //skip escaped char
+            }else if(*cur == '\\') {
+                ++cur; //skip '\'
+                if(cur < buffer_end_) 
+                    ++cur; //skip escaped char
             } else {
-                ++buffer_ptr_;
+                ++cur;
             }
         }
         form_token(result,TokenKind::string_literal,start,loc);
+        buffer_ptr_ = cur;
     }
     //char is unicode code point enclosed in single quotes
     void Lexer::lex_char(Token& result,const char* start,SourceLocation loc) {
-        buffer_ptr_++;
-        while(buffer_ptr_ < buffer_end_) {
-            if(*buffer_ptr_ == '\'') {
-                buffer_ptr_++;
+        
+        const char* cur = buffer_ptr_;
+        const char* end = buffer_end_;
+        cur++;
+        while(cur < end) {
+            if(*cur == '\'') {
+                cur++;
                 //current char is closing '
                 break;
-            }else if(*buffer_ptr_ == '\\') {
-                ++buffer_ptr_;
-                if(buffer_ptr_ < buffer_end_)
-                    ++buffer_ptr_;
+            }else if(*cur == '\\') {
+                ++cur;
+                if(cur < buffer_end_)
+                    ++cur;
             }else {
-                ++buffer_ptr_;
+                ++cur;
             }
         }
         //token example: 'a', '\n', '\u1234'
         form_token(result,TokenKind::char_constant,start,loc);
+        buffer_ptr_ = cur;
     }
 
     void Lexer::lex_punctuation(Token& result,const char* start,SourceLocation loc) {
-        //current maximum punctuation length is 2
-        char current_char = peek();
-        //use local pointer to avoid memory access overhead
-        auto * cur = buffer_ptr_;
-        cur++;
         TokenKind kind = TokenKind::unknown;
-        switch(current_char){
-            
+        const char* cur=buffer_ptr_;
+        const char* end = buffer_end_;
+        if(cur >= end) {
+            form_token(result,kind,start,loc);
+            return;
         }
-        //unknown punctuation, consume char until whitespace
-        while(buffer_ptr_ < buffer_end_ && !is_whitespace(*buffer_ptr_)) 
-            ++buffer_ptr_;
-        form_token(result,TokenKind::unknown,start,loc);
+
+        const char c = *cur++;
+#include "nova/Lex/Punctuation.inc"
+
+        if(kind == TokenKind::unknown) {
+            //unknown punctuation, consume char until whitespace
+            while(cur < buffer_end_ && !is_whitespace(*cur))
+                ++cur;
+        }
+        form_token(result,kind,start,loc);
+        buffer_ptr_ = cur;
     }
 
     //hitherto all functions are implemented
