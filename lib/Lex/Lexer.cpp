@@ -1,4 +1,6 @@
-#include"nova/Lex/Lexer.hpp"
+#include "nova/Lex/Lexer.hpp"
+
+#include <cstring>
 
 namespace nova {
     Lexer::Lexer(const SourceManager& sm,IdentifierTable& id_table,uint16_t file_id)
@@ -59,21 +61,39 @@ namespace nova {
                     // single line comment
                     seen_space_ = true;
                     cur += 2;
-                    cur=static_cast<const char*>(memchr(cur, '\n', static_cast<size_t>(end - cur)));
-                    if(cur < end && *cur == '\n') {
-                        ++cur;
+                    const void* newline_pos =
+                        std::memchr(cur, '\n', static_cast<size_t>(end - cur));
+                    if(!newline_pos) {
+                        cur = end;
+                    } else {
+                        cur = static_cast<const char*>(newline_pos) + 1;
+                        at_start_of_line_ = true;
                     }
-                    at_start_of_line_ = true;
                 }else if(*(cur + 1) == '*') {
                     //mutilple line comment
                     seen_space_ = true;
                     cur += 2;
-                    while(cur + 1 < end){
-                        if(*cur == '*' && *(cur + 1) == '/'){
-                            cur += 2;
+                    while(cur < end) {
+                        const void* star_pos =
+                            std::memchr(cur, '*', static_cast<size_t>(end - cur));
+                        if(!star_pos) {
+                            if(std::memchr(cur, '\n', static_cast<size_t>(end - cur))) {
+                                at_start_of_line_ = true;
+                            }
+                            cur = end; // unterminated comment: consume to EOF
                             break;
                         }
-                        ++cur;
+                        const char* star = static_cast<const char*>(star_pos);
+                        const void* newline_in_chunk =
+                            std::memchr(cur, '\n', static_cast<size_t>(star - cur));
+                        if(newline_in_chunk) {
+                            at_start_of_line_ = true;
+                        }
+                        if((star + 1) < end && *(star + 1) == '/') {
+                            cur = star + 2;
+                            break;
+                        }
+                        cur = star + 1;
                     }
 
                 }else {

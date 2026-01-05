@@ -144,20 +144,26 @@ std::string read_file(std::string_view path) {
 }
 
 std::string generate_source(std::size_t target_bytes) {
-    constexpr std::string_view kChunk =
-        "func main() {\n"
-        "  let x = 42;\n"
-        "  let y = 0x2A;\n"
-        "  let z = \"Hello, World!\";\n"
-        "  let c = 'a';\n"
-        "  // comment\n"
-        "  x = x + 1;\n"
-        "}\n";
+    constexpr std::size_t kCommentPayloadBytes = 4 * 1024;
+    const std::string& chunk = [] {
+        std::string out;
+        out.append("func main() {\n");
+        out.append("  let x = 42;\n");
+        out.append("  let y = 0x2A;\n");
+        out.append("  let z = \"Hello, World!\";\n");
+        out.append("  let c = 'a';\n");
+        out.append("  // ");
+        out.append(kCommentPayloadBytes, 'x');
+        out.append("\n");
+        out.append("  x = x + 1;\n");
+        out.append("}\n");
+        return out;
+    }();
 
     std::string out;
-    out.reserve(target_bytes + static_cast<std::size_t>(kChunk.size()));
+    out.reserve(target_bytes + chunk.size());
     while (out.size() < target_bytes) {
-        out.append(kChunk);
+        out.append(chunk);
     }
     return out;
 }
